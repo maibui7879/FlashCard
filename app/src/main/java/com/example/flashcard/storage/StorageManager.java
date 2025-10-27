@@ -1,9 +1,9 @@
 package com.example.flashcard.storage;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.flashcard.models.Flashcard;
 import com.example.flashcard.models.FlashcardSet;
 import com.example.flashcard.models.UserStats;
 import com.google.gson.Gson;
@@ -27,7 +27,6 @@ public class StorageManager {
         gson = new Gson();
     }
 
-    // ================= FlashcardSet =================
     public List<FlashcardSet> getAllSets() {
         String json = sharedPreferences.getString(KEY_SETS, null);
         if (json == null) return new ArrayList<>();
@@ -68,6 +67,69 @@ public class StorageManager {
         saveAllSets(sets);
     }
 
+    public List<Flashcard> getAllFlashcards() {
+        List<Flashcard> allCards = new ArrayList<>();
+        List<FlashcardSet> sets = getAllSets();
+        for (FlashcardSet set : sets) {
+            if (set.getFlashcards() != null) {
+                allCards.addAll(set.getFlashcards());
+            }
+        }
+        return allCards;
+    }
+
+    public void addFlashcard(String setId, Flashcard card) {
+        List<FlashcardSet> sets = getAllSets();
+        for (FlashcardSet set : sets) {
+            if (set.getId().equals(setId)) {
+                List<Flashcard> cards = set.getFlashcards();
+                if (cards == null) cards = new ArrayList<>();
+                cards.add(card);
+                set.setFlashcards(cards);
+                break;
+            }
+        }
+        saveAllSets(sets);
+    }
+
+    public void updateFlashcard(String setId, Flashcard updatedCard) {
+        List<FlashcardSet> sets = getAllSets();
+        for (FlashcardSet set : sets) {
+            if (set.getId().equals(setId)) {
+                List<Flashcard> cards = set.getFlashcards();
+                if (cards == null) return;
+                for (int i = 0; i < cards.size(); i++) {
+                    if (cards.get(i).getId().equals(updatedCard.getId())) {
+                        cards.set(i, updatedCard);
+                        break;
+                    }
+                }
+                set.setFlashcards(cards);
+                break;
+            }
+        }
+        saveAllSets(sets);
+    }
+
+    public void deleteFlashcard(String setId, String cardId) {
+        List<FlashcardSet> sets = getAllSets();
+        for (FlashcardSet set : sets) {
+            if (set.getId().equals(setId)) {
+                List<Flashcard> cards = set.getFlashcards();
+                if (cards == null) return;
+                for (int i = 0; i < cards.size(); i++) {
+                    if (cards.get(i).getId().equals(cardId)) {
+                        cards.remove(i);
+                        break;
+                    }
+                }
+                set.setFlashcards(cards);
+                break;
+            }
+        }
+        saveAllSets(sets);
+    }
+
     public UserStats getUserStats() {
         String json = sharedPreferences.getString(KEY_USER, null);
         if (json == null) return null;
@@ -78,5 +140,15 @@ public class StorageManager {
         String json = gson.toJson(stats);
         sharedPreferences.edit().putString(KEY_USER, json).apply();
     }
-}
+    public List<Flashcard> getFlashcards(String setId) {
+        List<FlashcardSet> sets = getAllSets();
+        for (FlashcardSet set : sets) {
+            if (set.getId().equals(setId)) {
+                List<Flashcard> cards = set.getFlashcards();
+                return cards != null ? cards : new ArrayList<>();
+            }
+        }
+        return new ArrayList<>();
+    }
 
+}

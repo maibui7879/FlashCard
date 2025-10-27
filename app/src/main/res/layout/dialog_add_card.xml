@@ -1,6 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/btn_from_local"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thêm từ thẻ đã lưu"
+        android:backgroundTint="#1976D2"
+        android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/btn_create_new"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tạo thẻ mới"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#1976D2"
+        android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hủy"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#9E9E9E"
+        android:textColor="@android:color/white"/>
+</LinearLayout>
