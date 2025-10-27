@@ -2,6 +2,7 @@ package com.example.flashcard.ui.SetActivity;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -11,7 +12,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,15 +27,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class CreateCardDialog {
+public class EditCardDialog {
 
-    public interface OnCardCreatedListener {
-        void onCardCreated();
+    public interface OnCardUpdatedListener {
+        void onCardUpdated();
     }
 
-    public static void show(Context context, StorageManager storageManager, String setId, OnCardCreatedListener listener) {
+    public static void show(Context context, StorageManager storageManager, String setId, Flashcard card, OnCardUpdatedListener listener) {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_create_card, null);
@@ -55,14 +54,18 @@ public class CreateCardDialog {
         Button btnCreate = view.findViewById(R.id.btn_create);
 
         layoutMeaning.setVisibility(View.GONE); // ẩn ban đầu
-        etMeaning.setEnabled(false); // nghĩa tự điền, không sửa
+        etMeaning.setEnabled(false);
+
+        // điền dữ liệu hiện tại
+        etName.setText(card.getName());
+        etType.setText(card.getType());
 
         String[] types = {"noun", "verb", "adjective", "adverb", "phrase", "other"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, types);
         etType.setAdapter(adapter);
-        etType.setText("noun", false);
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnCreate.setText("Cập nhật");
 
         RequestQueue queue = Volley.newRequestQueue(context);
 
@@ -77,16 +80,16 @@ public class CreateCardDialog {
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                     response -> {
-                        Log.d("CreateCardDialog", "API response received: " + response.toString());
+                        Log.d("EditCardDialog", "API response received: " + response.toString());
                         try {
                             JSONArray sentences = response.getJSONArray("sentences");
                             if (sentences.length() > 0) {
                                 JSONObject first = sentences.getJSONObject(0);
                                 JSONObject fields = first.getJSONObject("fields");
                                 String meaning = fields.getString("vi");
-                                Log.d("CreateCardDialog", "Meaning: " + meaning);
+                                Log.d("EditCardDialog", "Meaning: " + meaning);
                                 etMeaning.setText(meaning);
-                                layoutMeaning.setVisibility(View.VISIBLE); // hiển thị khi có nghĩa
+                                layoutMeaning.setVisibility(View.VISIBLE);
                             } else {
                                 Toast.makeText(context, "Không tìm thấy nghĩa!", Toast.LENGTH_SHORT).show();
                             }
@@ -111,25 +114,14 @@ public class CreateCardDialog {
                 return;
             }
 
-            List<Flashcard> allCards = storageManager.getAllFlashcards(); // lấy tất cả flashcards
-            List<String> wrongAnswers = new ArrayList<>();
-            for (Flashcard card : allCards) {
-                if (!card.getMeaning().equals(meaning)) wrongAnswers.add(card.getMeaning());
-            }
-            while (wrongAnswers.size() > 3) wrongAnswers.remove((int) (Math.random() * wrongAnswers.size()));
+            card.setName(name);
+            card.setMeaning(meaning);
+            card.setType(type.isEmpty() ? "other" : type);
 
-            Flashcard newCard = new Flashcard(
-                    UUID.randomUUID().toString(),
-                    name,
-                    type.isEmpty() ? "other" : type,
-                    meaning,
-                    wrongAnswers
-            );
-
-            storageManager.addFlashcard(setId, newCard);
-            Toast.makeText(context, "Đã tạo thẻ mới", Toast.LENGTH_SHORT).show();
+            storageManager.updateFlashcard(setId, card);
+            Toast.makeText(context, "Đã cập nhật thẻ", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
-            listener.onCardCreated();
+            listener.onCardUpdated();
         });
 
         dialog.show();

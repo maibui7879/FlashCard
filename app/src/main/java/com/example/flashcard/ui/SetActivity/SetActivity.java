@@ -1,6 +1,5 @@
 package com.example.flashcard.ui.SetActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -91,9 +90,10 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
 
     @Override
     public void onEditClick(Flashcard card) {
-        // Thay vì mở EditCardDialog, chuyển sang DictionaryActivity
-        Intent intent = new Intent(this, DictionaryActivity.class);
-        intent.putExtra("WORD", card.getName());
-        startActivity(intent);
+        EditCardDialog.show(this, storageManager, currentSet.getId(), card, () -> {
+            refreshCurrentSet(currentSet.getId());
+            loadCards();
+        });
     }
 }
+

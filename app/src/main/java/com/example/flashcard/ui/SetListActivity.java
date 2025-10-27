@@ -71,8 +71,11 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
 
     @Override
     public void onItemClick(FlashcardSet set) {
-        Toast.makeText(this, "Mở Set: " + set.getName(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(SetListActivity.this, SetActivity.class);
+        intent.putExtra("SET_ID", set.getId());
+        startActivity(intent);
     }
+
 
     @Override
     public void onMenuClick(FlashcardSet set, View menuView) {
