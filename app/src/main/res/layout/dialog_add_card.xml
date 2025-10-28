@@ -6,14 +6,6 @@
     android:layout_height="wrap_content">
 
     <Button
-        android:id="@+id/btn_from_local"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Thêm từ thẻ đã lưu"
-        android:backgroundTint="#1976D2"
-        android:textColor="@android:color/white"/>
-
-    <Button
         android:id="@+id/btn_create_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

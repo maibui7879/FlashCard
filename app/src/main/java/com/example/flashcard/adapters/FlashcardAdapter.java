@@ -39,9 +39,30 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         Flashcard card = cards.get(position);
         holder.tvFront.setText(card.getName());
+        holder.tvType.setText(card.getType());
+
+        int color;
+        switch (card.getType().toLowerCase()) {
+            case "verb":
+                color = 0xFFE53935; // đỏ
+                break;
+            case "adjective":
+                color = 0xFFFB8C00; // cam
+                break;
+            case "adverb":
+                color = 0xFF8E24AA; // tím
+                break;
+            case "noun":
+            default:
+                color = 0xFF1976D2; // xanh dương
+                break;
+        }
+
+        holder.tvType.setTextColor(color);
+        holder.borderTop.setBackgroundColor(color);
 
         holder.btnDelete.setOnClickListener(v -> listener.onDeleteClick(card));
-        holder.tvFront.setOnClickListener(v -> listener.onEditClick(card)); // click tên để sửa
+        holder.tvFront.setOnClickListener(v -> listener.onEditClick(card));
     }
 
     @Override
@@ -55,13 +76,16 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardAdapter.View
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvFront;
+        TextView tvFront, tvType;
         ImageView btnDelete;
+        View borderTop;
 
         ViewHolder(View itemView) {
             super(itemView);
             tvFront = itemView.findViewById(R.id.tv_front);
+            tvType = itemView.findViewById(R.id.tv_type);
             btnDelete = itemView.findViewById(R.id.btn_delete);
+            borderTop = itemView.findViewById(R.id.type_border_top);
         }
     }
 }

@@ -1,9 +1,17 @@
 package com.example.flashcard.ui.SetActivity;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.flashcard.R;
 import com.example.flashcard.adapters.FlashcardAdapter;
 import com.example.flashcard.models.Flashcard;
@@ -11,6 +19,7 @@ import com.example.flashcard.models.FlashcardSet;
 import com.example.flashcard.storage.StorageManager;
 import com.example.flashcard.ui.BaseActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +31,11 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
     private FlashcardSet currentSet;
     private FlashcardAdapter adapter;
     private List<Flashcard> cardList;
+    private List<Flashcard> filteredList;
+
+    private EditText etSearch;
+    private AutoCompleteTextView spinnerFilter;
+    private Button btnLearn, btnQuiz;
 
     @Override
     protected String getHeaderTitle() {
@@ -49,8 +63,16 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
 
         recyclerViewCards = findViewById(R.id.recyclerViewCards);
         fabAddCard = findViewById(R.id.fab_add_card);
+        etSearch = findViewById(R.id.et_search);
+        spinnerFilter = findViewById(R.id.spinner_filter);
+        btnLearn = findViewById(R.id.btn_learn);
+        btnQuiz = findViewById(R.id.btn_quiz);
+
         recyclerViewCards.setLayoutManager(new GridLayoutManager(this, 2));
+
+        setupFilter();
         loadCards();
+        setupSearch();
 
         fabAddCard.setOnClickListener(v ->
                 CreateCardDialog.show(this, storageManager, currentSet.getId(), () -> {
@@ -58,6 +80,12 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
                     loadCards();
                 })
         );
+
+        // Xu li che do learn o day
+        btnLearn.setOnClickListener(v -> Toast.makeText(this, "Vào học", Toast.LENGTH_SHORT).show());
+
+        // xu li che do quiz ơ day
+        btnQuiz.setOnClickListener(v -> Toast.makeText(this, "Vào quiz", Toast.LENGTH_SHORT).show());
     }
 
     private void refreshCurrentSet(String setId) {
@@ -72,21 +100,69 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
 
     private void loadCards() {
         cardList = currentSet.getFlashcards() != null ? currentSet.getFlashcards() : new ArrayList<>();
+        filteredList = new ArrayList<>(cardList);
         if (adapter == null) {
-            adapter = new FlashcardAdapter(cardList, this);
+            adapter = new FlashcardAdapter(filteredList, this);
             recyclerViewCards.setAdapter(adapter);
         } else {
-            adapter.updateList(cardList);
+            adapter.updateList(filteredList);
         }
+    }
+
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { filterCards(); }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void setupFilter() {
+        String[] types = {"Tất cả", "noun", "verb", "adjective", "adverb"};
+        ArrayAdapter<String> adapterFilter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types);
+        spinnerFilter.setAdapter(adapterFilter);
+
+        spinnerFilter.setText("Tất cả", false);
+
+        spinnerFilter.setOnItemClickListener((parent, view, position, id) -> {
+            String selected = adapterFilter.getItem(position);
+            spinnerFilter.setText(selected, false);
+            filterCards();
+        });
+
+        spinnerFilter.setOnClickListener(v -> spinnerFilter.showDropDown());
+        spinnerFilter.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) spinnerFilter.showDropDown(); });
+    }
+
+    private void filterCards() {
+        String query = etSearch.getText().toString().toLowerCase().trim();
+        String selectedType = spinnerFilter.getText().toString();
+
+        filteredList.clear();
+        for (Flashcard card : cardList) {
+            boolean matchesSearch = card.getName().toLowerCase().contains(query);
+            boolean matchesType = selectedType.equals("Tất cả") ||
+                    card.getType().equalsIgnoreCase(selectedType);
+            if (matchesSearch && matchesType) filteredList.add(card);
+        }
+        adapter.updateList(filteredList);
     }
 
     @Override
     public void onDeleteClick(Flashcard card) {
-        storageManager.deleteFlashcard(currentSet.getId(), card.getId());
-        refreshCurrentSet(currentSet.getId());
-        loadCards();
-        Toast.makeText(this, "Đã xóa thẻ", Toast.LENGTH_SHORT).show();
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc chắn muốn xóa thẻ này không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    storageManager.deleteFlashcard(currentSet.getId(), card.getId());
+                    refreshCurrentSet(currentSet.getId());
+                    loadCards();
+                    Toast.makeText(this, "Đã xóa thẻ", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                .show();
     }
+
 
     @Override
     public void onEditClick(Flashcard card) {
@@ -96,4 +172,3 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
         });
     }
 }
-

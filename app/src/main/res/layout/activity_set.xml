@@ -3,17 +3,130 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SetActivity.SetActivity"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    tools:context=".ui.SetActivity.SetActivity">
 
+    <!-- Hàng Search + Filter -->
+    <LinearLayout
+        android:id="@+id/search_filter_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical"
+        android:background="@android:color/white"
+        android:elevation="4dp">
+
+        <!-- Search Box -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            app:boxBackgroundMode="outline"
+            app:boxBackgroundColor="@android:color/white"
+            app:hintEnabled="false"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp"
+            app:boxStrokeColor="@color/blue_primary"
+            app:boxStrokeWidthFocused="2dp">
+
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Tìm kiếm thẻ..."
+                android:background="@null"
+                android:inputType="text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:textColor="@color/black"
+                android:textColorHint="#9E9E9E"
+                android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Filter Dropdown -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="110dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
+            app:endIconMode="dropdown_menu"
+            app:boxBackgroundMode="outline"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp"
+            app:boxStrokeColor="@color/blue_primary"
+            app:boxStrokeWidthFocused="2dp"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spinner_filter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#1976D2"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:gravity="center"
+                android:background="@null"
+                android:focusable="false"
+                android:cursorVisible="false"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <!-- Hàng nút Learn / Quiz -->
+    <LinearLayout
+        android:id="@+id/btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_filter_container"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btn_learn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:text="Learn"
+            android:backgroundTint="#1976D2"
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btn_quiz"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:text="Quiz"
+            android:backgroundTint="#FFC107"
+            android:textColor="@android:color/black"/>
+    </LinearLayout>
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCards"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/btn_container"
         android:padding="12dp"
         android:clipToPadding="false"
         tools:listitem="@layout/item_flashcard" />
 
+    <!-- Floating Add Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_card"
         android:layout_width="wrap_content"
@@ -24,4 +137,5 @@
         android:src="@drawable/ic_add_white"
         app:backgroundTint="#1976D2"
         app:tint="@android:color/white" />
+
 </RelativeLayout>

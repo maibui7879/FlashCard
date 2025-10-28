@@ -26,6 +26,11 @@ public class FlashcardSetAdapter extends RecyclerView.Adapter<FlashcardSetAdapte
         this.setList = setList;
         this.listener = listener;
     }
+    public void updateList(List<FlashcardSet> newList) {
+        setList.clear();
+        setList.addAll(newList);
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
