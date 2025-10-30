@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -66,6 +67,7 @@ public class StudyActivity extends AppCompatActivity {
 
     private Button btnPlayUntracked, btnPlayTracked;
     private Button btnShuffleUntracked, btnShuffleTracked;
+    private ImageView ivStar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +96,7 @@ public class StudyActivity extends AppCompatActivity {
         btnPlayTracked = findViewById(R.id.btn_play_tracked);
         btnShuffleUntracked = findViewById(R.id.btn_shuffle_untracked);
         btnShuffleTracked = findViewById(R.id.btn_shuffle_tracked);
+        ivStar = findViewById(R.id.iv_star);
 
         // Nút Get a Hint
         findViewById(R.id.tv_get_hint).setOnClickListener(v -> showHint());
@@ -172,6 +175,9 @@ public class StudyActivity extends AppCompatActivity {
         View.OnClickListener shuffleClickListener = v -> shuffleCards();
         btnShuffleUntracked.setOnClickListener(shuffleClickListener);
         btnShuffleTracked.setOnClickListener(shuffleClickListener);
+
+        ivStar = findViewById(R.id.iv_star);
+        ivStar.setOnClickListener(v -> toggleStarStatus());
     }
 
     // --- Các hàm xử lý ---
@@ -198,6 +204,7 @@ public class StudyActivity extends AppCompatActivity {
 
         updateProgressUI(); // Cập nhật text số thẻ (ví dụ: 1 / 10)
         resetCardFlip(); // Luôn quay về mặt trước
+        updateStarIcon();
     }
 
     // Thực hiện animation lật thẻ
@@ -448,4 +455,43 @@ public class StudyActivity extends AppCompatActivity {
             stopPlayMode();
         }
     }
+
+    /**
+     * Xử lý khi người dùng nhấn vào nút ngôi sao.
+     */
+    private void toggleStarStatus() {
+        if (flashcards == null || flashcards.isEmpty()) return;
+
+        String currentCardId = flashcards.get(currentIndex).getId();
+        boolean isCurrentlyStarred = storageManager.isCardStarred(currentCardId);
+
+        // Lật trạng thái
+        if (isCurrentlyStarred) {
+            // Đang yêu thích -> Bỏ yêu thích
+            storageManager.removeStarredCard(currentCardId);
+            Toast.makeText(this, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+        } else {
+            // Chưa yêu thích -> Thêm yêu thích
+            storageManager.addStarredCard(currentCardId);
+            Toast.makeText(this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+        }
+
+        // Cập nhật lại icon ngay lập tức
+        updateStarIcon();
+    }
+    /**
+     * Cập nhật giao diện (icon) của ngôi sao dựa trên trạng thái của thẻ hiện tại.
+     */
+    private void updateStarIcon() {
+        if (flashcards == null || flashcards.isEmpty()) return;
+
+        String currentCardId = flashcards.get(currentIndex).getId();
+
+        if (storageManager.isCardStarred(currentCardId)) {
+            ivStar.setImageResource(R.drawable.ic_star_filled_yellow);
+        } else {
+            ivStar.setImageResource(R.drawable.ic_star_border_grey);
+        }
+    }
+
 }

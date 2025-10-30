@@ -18,6 +18,7 @@ public class StorageManager {
     private static final String PREF_NAME = "QUIZZLET_PREF";
     private static final String KEY_SETS = "FLASHCARD_SETS";
     private static final String KEY_USER = "USER_STATS";
+    private static final String KEY_STARRED = "STARRED_CARD_IDS";
 
     private SharedPreferences sharedPreferences;
     private Gson gson;
@@ -149,6 +150,55 @@ public class StorageManager {
             }
         }
         return new ArrayList<>();
+    }
+    /**
+     * Lấy danh sách ID của các thẻ đã yêu thích
+     */
+    public List<String> getStarredCardIds() {
+        String json = sharedPreferences.getString(KEY_STARRED, null);
+        if (json == null) {
+            return new ArrayList<>();
+        }
+        Type type = new TypeToken<List<String>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    /**
+     * Lưu lại toàn bộ danh sách ID thẻ yêu thích
+     */
+    private void saveStarredCardIds(List<String> starredIds) {
+        String json = gson.toJson(starredIds);
+        sharedPreferences.edit().putString(KEY_STARRED, json).apply();
+    }
+
+    /**
+     * Kiểm tra xem một thẻ có đang được yêu thích không
+     */
+    public boolean isCardStarred(String cardId) {
+        List<String> starredIds = getStarredCardIds();
+        return starredIds.contains(cardId);
+    }
+
+    /**
+     * Thêm một thẻ vào danh sách yêu thích
+     */
+    public void addStarredCard(String cardId) {
+        List<String> starredIds = getStarredCardIds();
+        if (!starredIds.contains(cardId)) {
+            starredIds.add(cardId);
+            saveStarredCardIds(starredIds);
+        }
+    }
+
+    /**
+     * Xóa một thẻ khỏi danh sách yêu thích
+     */
+    public void removeStarredCard(String cardId) {
+        List<String> starredIds = getStarredCardIds();
+        if (starredIds.contains(cardId)) {
+            starredIds.remove(cardId);
+            saveStarredCardIds(starredIds);
+        }
     }
 
 }
