@@ -4,6 +4,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -56,6 +57,16 @@ public class StudyActivity extends AppCompatActivity {
     private boolean isTrackingProgress = true;
     private Set<String> rememberedCardIds;
 
+    // Biến cho auto-play
+    private Handler playHandler;
+    private Runnable playRunnable;
+    private boolean isPlaying = false;
+    private static final long DELAY_FLIP_TO_BACK = 2000; // 2 giây (thời gian xem mặt trước)
+    private static final long DELAY_NEXT_CARD = 1500; // 1.5 giây (thời gian xem mặt sau)
+
+    private Button btnPlayUntracked, btnPlayTracked;
+    private Button btnShuffleUntracked, btnShuffleTracked;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +90,10 @@ public class StudyActivity extends AppCompatActivity {
         btnNextUntracked = findViewById(R.id.btn_next_card_untracked);
         btnWrongTracked = findViewById(R.id.btn_wrong_tracked);
         btnCorrectTracked = findViewById(R.id.btn_correct_tracked);
+        btnPlayUntracked = findViewById(R.id.btn_play_untracked);
+        btnPlayTracked = findViewById(R.id.btn_play_tracked);
+        btnShuffleUntracked = findViewById(R.id.btn_shuffle_untracked);
+        btnShuffleTracked = findViewById(R.id.btn_shuffle_tracked);
 
         // Nút Get a Hint
         findViewById(R.id.tv_get_hint).setOnClickListener(v -> showHint());
@@ -140,10 +155,23 @@ public class StudyActivity extends AppCompatActivity {
             goToNextCard(); // Qua thẻ mới
         });
 
-        // (Các nút khác như Play, Shuffle... hiện chỉ để làm cảnh)
-        findViewById(R.id.btn_play_untracked).setOnClickListener(v -> showToast("Play (Untracked)"));
-        findViewById(R.id.btn_shuffle_untracked).setOnClickListener(v -> showToast("Shuffle (Untracked)"));
-        // ... (tương tự cho các nút _tracked)
+//        // (Các nút khác như Play, Shuffle... hiện chỉ để làm cảnh)
+//        findViewById(R.id.btn_play_untracked).setOnClickListener(v -> showToast("Play (Untracked)"));
+//        findViewById(R.id.btn_shuffle_untracked).setOnClickListener(v -> showToast("Shuffle (Untracked)"));
+//        // ... (tương tự cho các nút _tracked)
+// Khởi tạo Handler và gán sự kiện
+        playHandler = new Handler(getMainLooper());
+        initPlayRunnable(); // Gọi hàm này để tạo Runnable
+
+        // Gán sự kiện cho 2 nút Play
+        View.OnClickListener playClickListener = v -> togglePlayMode();
+        btnPlayUntracked.setOnClickListener(playClickListener);
+        btnPlayTracked.setOnClickListener(playClickListener);
+
+        // Gán sự kiện cho 2 nút Shuffle
+        View.OnClickListener shuffleClickListener = v -> shuffleCards();
+        btnShuffleUntracked.setOnClickListener(shuffleClickListener);
+        btnShuffleTracked.setOnClickListener(shuffleClickListener);
     }
 
     // --- Các hàm xử lý ---
@@ -269,6 +297,106 @@ public class StudyActivity extends AppCompatActivity {
         cardBack.setRotationY(0f);
     }
 
+    //Xáo trộn danh sách thẻ hiện tại và quay về thẻ đầu tiên
+    private void shuffleCards() {
+        if (isPlaying) {
+            stopPlayMode(); // Dừng auto-play nếu đang chạy
+        }
+
+        // Dùng Collections để xáo trộn danh sách
+        java.util.Collections.shuffle(flashcards);
+
+        currentIndex = 0; // Quay về thẻ đầu
+        loadFlashcard(currentIndex); // Tải lại thẻ
+
+        Toast.makeText(this, "Đã xáo trộn thẻ!", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Khởi tạo vòng lặp (Runnable) cho chế độ tự động phát.
+     */
+    private void initPlayRunnable() {
+        playRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isPlaying) return; // Đã bị dừng thủ công
+
+                if (isFrontVisible) {
+                    // --- ĐANG Ở MẶT TRƯỚC ---
+                    // Lật ra mặt sau
+                    flipCard();
+                    // Hẹn giờ chạy lại Runnable này sau [DELAY_NEXT_CARD] (để xem mặt sau)
+                    playHandler.postDelayed(this, DELAY_NEXT_CARD);
+                } else {
+                    // --- ĐANG Ở MẶT SAU ---
+                    // Kiểm tra xem đây có phải thẻ cuối cùng không
+                    if (currentIndex < flashcards.size() - 1) {
+                        // Nếu chưa phải thẻ cuối, chuyển thẻ tiếp theo
+                        goToNextCard(); // Hàm này sẽ tự động reset về mặt trước
+                        // Hẹn giờ chạy lại Runnable này sau [DELAY_FLIP_TO_BACK] (để xem mặt trước)
+                        playHandler.postDelayed(this, DELAY_FLIP_TO_BACK);
+                    } else {
+                        // Nếu ĐÂY LÀ THẺ CUỐI CÙNG
+                        Toast.makeText(StudyActivity.this, "Đã phát hết thẻ!", Toast.LENGTH_SHORT).show();
+                        stopPlayMode();
+                        // Tùy chọn: Quay về thẻ đầu tiên sau khi kết thúc
+                        currentIndex = 0;
+                        loadFlashcard(currentIndex);
+                    }
+                }
+            }
+        };
+    }
+
+    //Bật hoặc Tắt chế độ tự động phát
+    private void togglePlayMode() {
+        if (isPlaying) {
+            stopPlayMode();
+        } else {
+            startPlayMode();
+        }
+    }
+
+    //Bắt đầu chế độ tự động phát
+    private void startPlayMode() {
+        isPlaying = true;
+        btnPlayUntracked.setText("■"); // Biểu tượng Stop
+        btnPlayTracked.setText("■"); // Biểu tượng Stop
+
+        // Khóa các nút điều khiển khác khi đang auto-play
+        disableControlsForPlay(false);
+
+        // Bắt đầu vòng lặp (hiển thị mặt trước trong [DELAY_FLIP_TO_BACK] giây)
+        playHandler.postDelayed(playRunnable, DELAY_FLIP_TO_BACK);
+    }
+
+    //Dừng chế độ tự động phát
+    private void stopPlayMode() {
+        isPlaying = false;
+        playHandler.removeCallbacks(playRunnable); // Hủy mọi lịch hẹn chạy
+        btnPlayUntracked.setText("▶"); // Biểu tượng Play
+        btnPlayTracked.setText("▶"); // Biểu tượng Play
+
+        // Mở lại các nút điều khiển
+        disableControlsForPlay(true);
+    }
+
+    //Hàm tiện ích để khóa/mở các nút điều khiển khi đang auto-play
+    private void disableControlsForPlay(boolean enabled) {
+        // (Untracked)
+        btnPrevUntracked.setEnabled(enabled);
+        btnNextUntracked.setEnabled(enabled);
+        btnShuffleUntracked.setEnabled(enabled);
+        // (Tracked)
+        btnWrongTracked.setEnabled(enabled);
+        btnCorrectTracked.setEnabled(enabled);
+        btnShuffleTracked.setEnabled(enabled);
+        // Chung
+        flashcardContainer.setEnabled(enabled);
+        switchTrackProgress.setEnabled(enabled);
+        tv_get_hint.setEnabled(enabled);
+    }
+
     // Kết thúc học và LƯU KẾT QUẢ (chỉ khi tracking)
     private void finishStudyAndSave() {
         int totalCards = flashcards.size();
@@ -311,5 +439,13 @@ public class StudyActivity extends AppCompatActivity {
     // Hàm tạm để test (xóa sau)
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Luôn dừng auto-play khi thoát khỏi màn hình
+        if (isPlaying) {
+            stopPlayMode();
+        }
     }
 }
