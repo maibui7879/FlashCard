@@ -113,16 +113,16 @@
                     android:text="[noun]"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="20sp" />
-                <TextView
-                    android:id="@+id/tvHint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:textColor="@color/blue_primary"
-                    android:textSize="18sp"
-                    android:visibility="gone"
-                    tools:text="Hint: Q..."
-                    tools:visibility="visible"/>
+<!--                <TextView-->
+<!--                    android:id="@+id/tvHint"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:textColor="@color/blue_primary"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:visibility="gone"-->
+<!--                    tools:text="Hint: Q..."-->
+<!--                    tools:visibility="visible"/>-->
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -281,9 +281,8 @@
                     android:id="@+id/btn_fullscreen_untracked"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Fullscreen"
-                    android:src="@drawable/ic_fullscreen" />
+                    android:src="@drawable/fullscreen" />
 
             </LinearLayout>
 
@@ -308,7 +307,7 @@
 
                 <TextView
                     android:id="@+id/tv_card_progress_tracked"
-                    android:layout_width="0dp"
+                    android:layout_width="5dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"

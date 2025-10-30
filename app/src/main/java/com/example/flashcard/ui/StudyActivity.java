@@ -31,7 +31,7 @@ import java.util.Set;
 public class StudyActivity extends AppCompatActivity {
 
     // Khai báo các View từ activity_study.xml
-    private TextView tvFrontWord, tvFrontType, tvBackMeaning, tvHint;
+    private TextView tvFrontWord, tvFrontType, tvBackMeaning, tv_get_hint;
     private TextView tvCardProgressUntracked, tvCardProgressTracked, tvRememberedCount;
     private CardView cardFront, cardBack;
     private FrameLayout flashcardContainer;
@@ -65,7 +65,7 @@ public class StudyActivity extends AppCompatActivity {
         tvFrontWord = findViewById(R.id.tvFrontWord);
         tvFrontType = findViewById(R.id.tvFrontType);
         tvBackMeaning = findViewById(R.id.tvBackMeaning);
-        tvHint = findViewById(R.id.tvHint);
+        tv_get_hint = findViewById(R.id.tv_get_hint);
         tvCardProgressUntracked = findViewById(R.id.tv_card_progress_untracked);
         tvCardProgressTracked = findViewById(R.id.tv_card_progress_tracked);
         tvRememberedCount = findViewById(R.id.tvRememberedCount);
@@ -129,16 +129,16 @@ public class StudyActivity extends AppCompatActivity {
             }
         });
 
-        // Nút điều hướng khi KHÔNG track
-//        btnPrevUntracked.setOnClickListener(v -> goToPrevCard());
-//        btnNextUntracked.setOnClickListener(v -> goToNextCard());
-//
-//        // Nút điều hướng khi CÓ track
-//        btnWrongTracked.setOnClickListener(v -> goToNextCard()); // Sai thì chỉ cần qua thẻ mới
-//        btnCorrectTracked.setOnClickListener(v -> {
-//            rememberedCardIds.add(flashcards.get(currentIndex).getId()); // Đánh dấu đã nhớ
-//            goToNextCard(); // Qua thẻ mới
-//        });
+        //Nút điều hướng khi KHÔNG track
+        btnPrevUntracked.setOnClickListener(v -> goToPrevCard());
+        btnNextUntracked.setOnClickListener(v -> goToNextCard());
+
+        // Nút điều hướng khi CÓ track
+        btnWrongTracked.setOnClickListener(v -> goToNextCard()); // Sai thì chỉ cần qua thẻ mới
+        btnCorrectTracked.setOnClickListener(v -> {
+            rememberedCardIds.add(flashcards.get(currentIndex).getId()); // Đánh dấu đã nhớ
+            goToNextCard(); // Qua thẻ mới
+        });
 
         // (Các nút khác như Play, Shuffle... hiện chỉ để làm cảnh)
         findViewById(R.id.btn_play_untracked).setOnClickListener(v -> showToast("Play (Untracked)"));
@@ -165,7 +165,7 @@ public class StudyActivity extends AppCompatActivity {
         tvFrontType.setText(fc.getType() != null && !fc.getType().isEmpty() ? "[" + fc.getType() + "]" : "");
         tvBackMeaning.setText(fc.getMeaning());
 
-        tvHint.setVisibility(View.GONE); // Ẩn hint cũ
+        tv_get_hint.setText("Get a hint");
         hintShown = false; // Reset trạng thái hint
 
         updateProgressUI(); // Cập nhật text số thẻ (ví dụ: 1 / 10)
@@ -174,7 +174,7 @@ public class StudyActivity extends AppCompatActivity {
 
     // Thực hiện animation lật thẻ
     private void flipCard() {
-        tvHint.setVisibility(View.GONE); // Ẩn hint khi lật
+        //tv_get_hint.setVisibility(View.GONE); // Ẩn hint khi lật
 
         if (isFrontVisible) { // Đang thấy mặt trước -> Lật ra sau
             flipOutAnimator.setTarget(cardFront);
@@ -223,9 +223,9 @@ public class StudyActivity extends AppCompatActivity {
 
         String meaning = flashcards.get(currentIndex).getMeaning();
         if (meaning != null && !meaning.isEmpty()) {
-            String hintText = "Hint: " + meaning.charAt(0) + "..."; // Lấy ký tự đầu
-            tvHint.setText(hintText);
-            tvHint.setVisibility(View.VISIBLE); // Hiện TextView hint
+            String hintText = "Hint: " + meaning.charAt(0) + meaning.charAt(1)+"...";
+            tv_get_hint.setText(hintText);
+            tv_get_hint.setVisibility(View.VISIBLE); // Hiện TextView hint
             hintShown = true;
         }
     }
