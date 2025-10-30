@@ -19,6 +19,10 @@ public class StorageManager {
     private static final String KEY_SETS = "FLASHCARD_SETS";
     private static final String KEY_USER = "USER_STATS";
     private static final String KEY_STARRED = "STARRED_CARD_IDS";
+    private static final String KEY_STUDY_PROGRESS = "STUDY_PROGRESS";
+    private static final String KEY_REMEMBERED_CARDS = "REMEMBERED_CARDS";
+
+
 
     private SharedPreferences sharedPreferences;
     private Gson gson;
@@ -199,6 +203,68 @@ public class StorageManager {
             starredIds.remove(cardId);
             saveStarredCardIds(starredIds);
         }
+    }
+
+    /**
+     * Lấy về 1 Map<SetID, Index> chứa toàn bộ tiến độ
+     */
+    private java.util.Map<String, Integer> getAllProgress() {
+        String json = sharedPreferences.getString(KEY_STUDY_PROGRESS, null);
+        if (json == null) {
+            return new java.util.HashMap<>();
+        }
+        Type type = new com.google.gson.reflect.TypeToken<java.util.HashMap<String, Integer>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    /**
+     * Lấy tiến độ (vị trí thẻ) của một Set cụ thể
+     */
+    public int getStudyProgress(String setId) {
+        java.util.Map<String, Integer> allProgress = getAllProgress();
+        // Lấy giá trị, nếu không có thì trả về 0 (bắt đầu từ đầu)
+        return allProgress.getOrDefault(setId, 0);
+    }
+
+    /**
+     * Lưu tiến độ (vị trí thẻ) cho một Set cụ thể
+     */
+    public void saveStudyProgress(String setId, int index) {
+        java.util.Map<String, Integer> allProgress = getAllProgress();
+        allProgress.put(setId, index); // Cập nhật vị trí mới
+        String json = gson.toJson(allProgress);
+        sharedPreferences.edit().putString(KEY_STUDY_PROGRESS, json).apply();
+    }
+
+    //Lấy về Map<SetID, Set<CardID>>
+    private java.util.Map<String, java.util.Set<String>> getAllRememberedProgress() {
+        String json = sharedPreferences.getString(KEY_REMEMBERED_CARDS, null);
+        if (json == null) {
+            return new java.util.HashMap<>();
+        }
+        // Lưu ý dùng Set<String> ở đây
+        Type type = new com.google.gson.reflect.TypeToken<java.util.HashMap<String, java.util.Set<String>>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    //Lấy danh sách thẻ đã nhớ của một Set cụ thể
+
+    public java.util.Set<String> getRememberedCards(String setId) {
+        java.util.Map<String, java.util.Set<String>> allProgress = getAllRememberedProgress();
+        java.util.Set<String> rememberedSet = allProgress.get(setId);
+
+        if (rememberedSet == null) {
+            return new java.util.HashSet<>(); // Trả về Set rỗng nếu chưa có
+        }
+        return rememberedSet;
+    }
+
+    //Lưu danh sách thẻ đã nhớ cho một Set cụ thể
+    public void saveRememberedCards(String setId, java.util.Set<String> cardIds) {
+        java.util.Map<String, java.util.Set<String>> allProgress = getAllRememberedProgress();
+        allProgress.put(setId, cardIds); // Cập nhật danh sách
+        String json = gson.toJson(allProgress);
+        sharedPreferences.edit().putString(KEY_REMEMBERED_CARDS, json).apply();
     }
 
 }

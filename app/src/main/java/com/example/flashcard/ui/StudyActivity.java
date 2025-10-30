@@ -103,7 +103,6 @@ public class StudyActivity extends AppCompatActivity {
 
         // --- Khởi tạo ---
         storageManager = new StorageManager(this); //
-        rememberedCardIds = new HashSet<>();
         loadAnimations(); // Gọi hàm tải animation
 
         // --- Lấy dữ liệu thẻ ---
@@ -127,7 +126,40 @@ public class StudyActivity extends AppCompatActivity {
             finish(); // Đóng activity nếu lỗi
             return;
         }
-        flashcards = currentSet.getFlashcards(); //
+        flashcards = currentSet.getFlashcards();
+
+// Kiểm tra xem Set và thẻ có tồn tại không
+        if (currentSet == null || currentSet.getFlashcards() == null || currentSet.getFlashcards().isEmpty()) {
+            Toast.makeText(this, "Lỗi: Bộ thẻ này trống hoặc không tồn tại.", Toast.LENGTH_LONG).show();
+            finish(); // Đóng activity nếu lỗi
+            return;
+        }
+        flashcards = currentSet.getFlashcards();
+
+
+        // --- BẮT ĐẦU KHỐI DÁN (PASTE) VÀO ĐÂY ---
+
+        // 1. Tải danh sách đã nhớ (Dán từ dòng 113)
+        rememberedCardIds = storageManager.getRememberedCards(currentSet.getId());
+
+        // 2. Tải vị trí đã lưu (Dán từ dòng 142)
+        int savedIndex = storageManager.getStudyProgress(currentSet.getId());
+
+        // Kiểm tra xem index có hợp lệ không
+        if (savedIndex > 0 && savedIndex < flashcards.size()) {
+            currentIndex = savedIndex; // Cập nhật vị trí bắt đầu
+        } else {
+            currentIndex = 0; // Nếu không có hoặc không hợp lệ, bắt đầu từ 0
+        }
+
+        // --- KẾT THÚC KHỐI DÁN ---
+
+
+        // --- Thiết lập ban đầu --- (Dòng 152 trong code cũ của bạn)
+        isTrackingProgress = switchTrackProgress.isChecked();
+        updateNavigationUI();
+        loadFlashcard(currentIndex); // Dòng này giờ sẽ dùng currentIndex và rememberedCardIds đã được tải
+
 
         // --- Thiết lập ban đầu ---
         isTrackingProgress = switchTrackProgress.isChecked(); // Lấy trạng thái ban đầu
@@ -144,6 +176,7 @@ public class StudyActivity extends AppCompatActivity {
             updateProgressUI(); // Cập nhật text tiến trình
             if (isTrackingProgress) {
                 rememberedCardIds.clear(); // Reset bộ đếm khi bật tracking
+                storageManager.saveRememberedCards(currentSet.getId(), rememberedCardIds);
             }
         });
 
@@ -158,11 +191,6 @@ public class StudyActivity extends AppCompatActivity {
             goToNextCard(); // Qua thẻ mới
         });
 
-//        // (Các nút khác như Play, Shuffle... hiện chỉ để làm cảnh)
-//        findViewById(R.id.btn_play_untracked).setOnClickListener(v -> showToast("Play (Untracked)"));
-//        findViewById(R.id.btn_shuffle_untracked).setOnClickListener(v -> showToast("Shuffle (Untracked)"));
-//        // ... (tương tự cho các nút _tracked)
-// Khởi tạo Handler và gán sự kiện
         playHandler = new Handler(getMainLooper());
         initPlayRunnable(); // Gọi hàm này để tạo Runnable
 
@@ -422,7 +450,8 @@ public class StudyActivity extends AppCompatActivity {
 
         // Lưu lại Set đã cập nhật vào SharedPreferences
         storageManager.updateSet(currentSet);
-
+        storageManager.saveStudyProgress(currentSet.getId(), 0);
+        storageManager.saveRememberedCards(currentSet.getId(), new HashSet<>());
         showCompletionDialog(true); // Hiển thị thông báo có kết quả
     }
 
@@ -493,5 +522,17 @@ public class StudyActivity extends AppCompatActivity {
             ivStar.setImageResource(R.drawable.ic_star_border_grey);
         }
     }
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Dừng auto-play nếu đang chạy
+        if (isPlaying) {
+            stopPlayMode();
+        }
+        // Lưu vị trí hiện tại vào StorageManager
+        if (currentSet != null) {
+            storageManager.saveStudyProgress(currentSet.getId(), currentIndex);
+            storageManager.saveRememberedCards(currentSet.getId(), rememberedCardIds);
+        }
+    }
 }
