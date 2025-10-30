@@ -11,6 +11,7 @@
         android:id="@+id/top_controls_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
         android:orientation="horizontal"
         android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,7 +24,7 @@
             android:id="@+id/tv_get_hint"
             android:layout_width="228dp"
             android:layout_height="76dp"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:drawablePadding="8dp"
@@ -35,8 +36,8 @@
 
         <ImageView
             android:id="@+id/iv_edit"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
@@ -47,8 +48,8 @@
 
         <ImageView
             android:id="@+id/iv_volume"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
@@ -58,8 +59,8 @@
 
         <ImageView
             android:id="@+id/iv_star"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
@@ -88,7 +89,7 @@
             android:id="@+id/card_front"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="26dp"
             app:cardElevation="8dp">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -112,6 +113,16 @@
                     android:text="[noun]"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="20sp" />
+                <TextView
+                    android:id="@+id/tvHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@color/blue_primary"
+                    android:textSize="18sp"
+                    android:visibility="gone"
+                    tools:text="Hint: Q..."
+                    tools:visibility="visible"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -120,7 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="26dp"
             app:cardElevation="8dp">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -136,16 +147,7 @@
                     android:textColor="@android:color/black"
                     android:textSize="28sp" />
 
-                <TextView
-                    android:id="@+id/tvHint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:textColor="@color/blue_primary"
-                    android:textSize="18sp"
-                    android:visibility="gone"
-                    tools:text="Hint: Q..."
-                    tools:visibility="visible"/>
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </FrameLayout>

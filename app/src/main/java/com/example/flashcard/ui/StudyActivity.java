@@ -227,13 +227,6 @@ public class StudyActivity extends AppCompatActivity {
             tvHint.setText(hintText);
             tvHint.setVisibility(View.VISIBLE); // Hiện TextView hint
             hintShown = true;
-
-            // Nếu đang ở mặt trước, tự lật ra sau để thấy hint
-            if (isFrontVisible) {
-                flipCard();
-            }
-        } else {
-            showToast("Thẻ này không có nghĩa để gợi ý!");
         }
     }
 
@@ -261,11 +254,19 @@ public class StudyActivity extends AppCompatActivity {
         }
     }
 
-    // Đưa thẻ về mặt trước (không animation)
     private void resetCardFlip() {
         isFrontVisible = true;
-        cardFront.setAlpha(1f); cardFront.setRotationY(0f); cardFront.setVisibility(View.VISIBLE);
-        cardBack.setAlpha(0f); cardBack.setRotationY(0f); cardBack.setVisibility(View.GONE);
+
+        // Luôn để cả 2 thẻ ở trạng thái VISIBLE
+        cardFront.setVisibility(View.VISIBLE);
+        cardBack.setVisibility(View.VISIBLE);
+
+        // Dùng ALPHA (độ mờ) để ẩn/hiện
+        cardFront.setAlpha(1f); // 1f = Hiện rõ
+        cardFront.setRotationY(0f);
+
+        cardBack.setAlpha(0f);  // 0f = Ẩn (trong suốt)
+        cardBack.setRotationY(0f);
     }
 
     // Kết thúc học và LƯU KẾT QUẢ (chỉ khi tracking)
