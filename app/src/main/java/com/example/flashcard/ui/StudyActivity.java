@@ -18,6 +18,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import com.example.flashcard.ui.BaseActivity;
+
 
 import com.example.flashcard.R;
 import com.example.flashcard.models.Flashcard;
@@ -30,7 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StudyActivity extends AppCompatActivity {
+public class StudyActivity extends BaseActivity {
 
     // Khai báo các View từ activity_study.xml
     private TextView tvFrontWord, tvFrontType, tvBackMeaning, tv_get_hint;
@@ -72,8 +74,8 @@ public class StudyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_study); // Load layout bạn đã tạo
-
+        TextView headerTitle = findViewById(R.id.headerTitle);
+        headerTitle.setText("Study Mode");
         // --- Ánh xạ Views (Tìm các view theo ID) ---
         tvFrontWord = findViewById(R.id.tvFrontWord);
         tvFrontType = findViewById(R.id.tvFrontType);
@@ -459,7 +461,7 @@ public class StudyActivity extends AppCompatActivity {
     private void showCompletionDialog(boolean wasTracked) {
         String message;
         if (wasTracked) {
-            message = "Bạn đã học xong.\nKết quả: Đã nhớ " + rememberedCardIds.size() + " / " + flashcards.size() + " thẻ.";
+            message = "Bạn đã học xong.\nKết quả: Đã nhớ " + rememberedCardIds.size() + " / " + flashcards.size() + " thẻ.\nXem thống kê";
         } else {
             message = "Bạn đã xem hết các thẻ trong bộ này.";
         }
@@ -535,4 +537,16 @@ public class StudyActivity extends AppCompatActivity {
             storageManager.saveRememberedCards(currentSet.getId(), rememberedCardIds);
         }
     }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_study;
+    }
+
+    @Override
+    protected String getHeaderTitle() {
+        return "Study Mode";
+    }
+
+
 }
