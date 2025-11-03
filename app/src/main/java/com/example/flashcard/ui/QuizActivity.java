@@ -21,11 +21,13 @@ import java.util.Set;
 
 public class QuizActivity extends BaseActivity {
 
+    private static final int MAX_CHOICES = 4; // 1 đúng + 3 sai
+
     private QuizRepository repo;
     private String setId, setName;
 
     private TextView tvSetName, tvProgress, tvQuestion;
-    private Button[] optionButtons = new Button[6];
+    private Button[] optionButtons = new Button[6]; // 2 nút dư sẽ ẩn
     private Button btnNext;
 
     private List<Flashcard> questions = new ArrayList<>();
@@ -68,7 +70,7 @@ public class QuizActivity extends BaseActivity {
         btnNext = findViewById(R.id.btnNext);
 
         tvSetName.setText(setName);
-        for (Button b : optionButtons) b.setOnClickListener(this::onOptionClicked);
+        for (Button b : optionButtons) if (b != null) b.setOnClickListener(this::onOptionClicked);
 
         btnNext.setOnClickListener(v -> {
             qIndex++;
@@ -81,57 +83,86 @@ public class QuizActivity extends BaseActivity {
         enableOptions(true);
         btnNext.setEnabled(false);
 
-        Flashcard card = questions.get(qIndex);
-        tvQuestion.setText(card.getName());            // Câu hỏi: dùng name
-        tvProgress.setText((qIndex + 1) + "/" + questions.size());
-        currentCorrect = card.getMeaning();            // Đáp án đúng: meaning
+        for (Button b : optionButtons) if (b != null) b.setBackgroundColor(0xFFFFFFFF);
 
-        List<String> options = buildOptions(card, questions, 6);
+        Flashcard card = questions.get(qIndex);
+        tvQuestion.setText(card.getName());
+        tvProgress.setText((qIndex + 1) + "/" + questions.size());
+        currentCorrect = card.getMeaning();
+
+        List<String> options = buildOptions(card, questions, MAX_CHOICES);
 
         for (int i = 0; i < optionButtons.length; i++) {
+            Button b = optionButtons[i];
+            if (b == null) continue;
             if (i < options.size()) {
-                optionButtons[i].setVisibility(View.VISIBLE);
-                optionButtons[i].setText(options.get(i));
-            } else optionButtons[i].setVisibility(View.GONE);
+                b.setVisibility(View.VISIBLE);
+                b.setText(options.get(i));
+            } else {
+                b.setVisibility(View.GONE);
+            }
         }
     }
 
     private void onOptionClicked(View v) {
         String chosen = ((Button) v).getText().toString();
-        if (chosen.equalsIgnoreCase(currentCorrect)) score++;
+        if (chosen.equalsIgnoreCase(currentCorrect)) {
+            score++;
+            v.setBackgroundColor(0xFF4CAF50); // đúng
+        } else {
+            v.setBackgroundColor(0xFFE53935); // sai
+            for (Button b : optionButtons) {
+                if (b != null && b.getVisibility() == View.VISIBLE &&
+                        b.getText().toString().equalsIgnoreCase(currentCorrect)) {
+                    b.setBackgroundColor(0xFF4CAF50);
+                    break;
+                }
+            }
+        }
         enableOptions(false);
         btnNext.setEnabled(true);
     }
 
-    private void enableOptions(boolean enable) { for (Button b : optionButtons) b.setEnabled(enable); }
+    private void enableOptions(boolean enable) {
+        for (Button b : optionButtons) if (b != null) b.setEnabled(enable);
+    }
 
-    /** Sinh tối đa `max` đáp án (1 đúng + max-1 sai), không trùng, shuffle */
     private List<String> buildOptions(Flashcard target, List<Flashcard> pool, int max) {
         String correct = target.getMeaning();
-        Set<String> opts = new HashSet<>();
+        Set<String> wrongs = new HashSet<>();
 
-        // Sai từ answers của chính card
         if (target.getAnswers() != null) {
             for (String a : target.getAnswers()) {
-                if (a != null && !a.equalsIgnoreCase(correct)) opts.add(a.trim());
+                if (a == null) continue;
+                String val = a.trim();
+                if (!val.equalsIgnoreCase(correct)) wrongs.add(val);
+                if (wrongs.size() >= max - 1) break;
             }
         }
-        // Sai từ meaning của các card khác
-        for (Flashcard f : pool) {
-            if (opts.size() >= max - 1) break;
-            if (f == target) continue;
-            String m = f.getMeaning();
-            if (m != null && !m.equalsIgnoreCase(correct)) opts.add(m.trim());
-        }
-        // Fallback: lấy name của các card khác nếu vẫn thiếu
-        for (Flashcard f : pool) {
-            if (opts.size() >= max - 1) break;
-            if (f == target) continue;
-            String n = f.getName();
-            if (n != null && !n.equalsIgnoreCase(correct)) opts.add(n.trim());
+
+        if (wrongs.size() < max - 1) {
+            for (Flashcard f : pool) {
+                if (f == target) continue;
+                String m = f.getMeaning();
+                if (m != null && !m.equalsIgnoreCase(correct)) {
+                    wrongs.add(m.trim());
+                    if (wrongs.size() >= max - 1) break;
+                }
+            }
         }
 
-        List<String> result = new ArrayList<>(opts);
+        if (wrongs.size() < max - 1) {
+            for (Flashcard f : pool) {
+                if (f == target) continue;
+                String n = f.getName();
+                if (n != null && !n.equalsIgnoreCase(correct)) {
+                    wrongs.add(n.trim());
+                    if (wrongs.size() >= max - 1) break;
+                }
+            }
+        }
+
+        List<String> result = new ArrayList<>(wrongs);
         result.add(correct);
         Collections.shuffle(result);
 
@@ -142,8 +173,8 @@ public class QuizActivity extends BaseActivity {
     }
 
     private void saveAndFinish() {
-        repo.saveQuizResult(setId,
-                new QuizResult(setId, setName, score, questions.size(), System.currentTimeMillis()));
+        // Lưu đúng với QuizResult hiện có (setId, totalQuestions, correctAnswers)
+        repo.saveQuizResult(setId, new QuizResult(setId, questions.size(), score));
 
         Intent i = new Intent(this, QuizResultActivity.class);
         i.putExtra("SET_ID", setId);
