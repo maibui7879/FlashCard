@@ -47,13 +47,18 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Khởi tạo StorageManager
         storageManager = new StorageManager(this);
-        recyclerViewSets = findViewById(R.id.recyclerViewSets);
-        fabAddSet = findViewById(R.id.fab_add_set);
 
+        // Khởi tạo RecyclerView
+        recyclerViewSets = findViewById(R.id.recyclerViewSets);
         recyclerViewSets.setLayoutManager(new LinearLayoutManager(this));
+
+        // Load danh sách Set
         loadSets();
 
+        // Nút thêm Set mới
+        fabAddSet = findViewById(R.id.fab_add_set);
         fabAddSet.setOnClickListener(v -> showCreateSetDialog());
     }
 
@@ -71,11 +76,11 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
 
     @Override
     public void onItemClick(FlashcardSet set) {
-        Intent intent = new Intent(SetListActivity.this, SetActivity.class);
+        // Mở SetActivity khi bấm vào Set
+        Intent intent = new Intent(this, SetActivity.class);
         intent.putExtra("SET_ID", set.getId());
         startActivity(intent);
     }
-
 
     @Override
     public void onMenuClick(FlashcardSet set, View menuView) {
@@ -85,8 +90,7 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.action_edit) {
-                // Mở SetActivity và truyền id của set
-                Intent intent = new Intent(SetListActivity.this, SetActivity.class);
+                Intent intent = new Intent(this, SetActivity.class);
                 intent.putExtra("SET_ID", set.getId());
                 startActivity(intent);
                 return true;
@@ -101,9 +105,8 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
         popup.show();
     }
 
-
     private void showCreateSetDialog() {
-        final Dialog dialog = new Dialog(this);
+        Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_create_set, null);
         dialog.setContentView(view);

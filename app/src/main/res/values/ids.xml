@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="toolbar" type="id" />
+    <item name="btn_stats" type="id" />
+    <item name="recyclerViewSets" type="id" />
+    <item name="fab_add_set" type="id" />
+    <item name="img_icon" type="id" />
+    <item name="btn_edit_menu" type="id" />
+    <item name="tv_set_name" type="id" />
+    <item name="tv_card_count" type="id" />
+    <item name="img_edit" type="id" />
+    <item name="headerTitle" type="id" />
+    <item name="contentFrame" type="id" />
+    <item name="navFlashcard" type="id" />
+    <item name="navUser" type="id" />
+</resources>

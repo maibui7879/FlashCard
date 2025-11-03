@@ -13,30 +13,42 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlashCard">
+
+        <!-- Activity chính cho việc học / quiz -->
         <activity
             android:name=".ui.StudyActivity"
             android:exported="false" />
-<!--        <activity-->
-<!--            android:name=".ui.DictionaryActivity"-->
-<!--            android:exported="false" />-->
+
+        <!-- SetActivity nằm trong thư mục con ui/SetActivity -->
         <activity
             android:name=".ui.SetActivity.SetActivity"
             android:exported="false" />
+
+        <!-- BaseActivity giữ header chung cho các màn -->
         <activity
             android:name=".ui.BaseActivity"
             android:exported="false" />
+
+        <!-- MainActivity giữ nhưng không phải launcher nữa -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="false" />
+
+        <!-- SetListActivity là màn chính khi mở app -->
         <activity
             android:name=".ui.SetListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- DashboardActivity hiển thị tổng số set, thẻ, tiến trình học tập -->
+        <activity
+            android:name=".ui.DashboardActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
