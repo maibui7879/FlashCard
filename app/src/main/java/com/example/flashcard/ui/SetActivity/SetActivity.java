@@ -39,41 +39,26 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
     private AutoCompleteTextView spinnerFilter;
     private Button btnLearn, btnQuiz;
 
-    @Override
-    protected String getHeaderTitle() {
-        return "Bộ thẻ của bạn";
-    }
-
-    @Override
-    protected int getLayoutResourceId() {
-        return R.layout.activity_set;
-    }
+    @Override protected String getHeaderTitle() { return "Bộ thẻ của bạn"; }
+    @Override protected int getLayoutResourceId() { return R.layout.activity_set; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         String setId = getIntent().getStringExtra("SET_ID");
-        if (setId == null) {
-            Toast.makeText(this, "Không tìm thấy bộ thẻ!", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+        if (setId == null) { Toast.makeText(this, "Không tìm thấy bộ thẻ!", Toast.LENGTH_SHORT).show(); finish(); return; }
 
         storageManager = new StorageManager(this);
         refreshCurrentSet(setId);
-        if (currentSet == null) {
-            Toast.makeText(this, "Bộ thẻ không tồn tại!", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+        if (currentSet == null) { Toast.makeText(this, "Bộ thẻ không tồn tại!", Toast.LENGTH_SHORT).show(); finish(); return; }
 
         recyclerViewCards = findViewById(R.id.recyclerViewCards);
-        fabAddCard = findViewById(R.id.fab_add_card);
-        etSearch = findViewById(R.id.et_search);
-        spinnerFilter = findViewById(R.id.spinner_filter);
-        btnLearn = findViewById(R.id.btn_learn);
-        btnQuiz = findViewById(R.id.btn_quiz);
+        fabAddCard       = findViewById(R.id.fab_add_card);
+        etSearch         = findViewById(R.id.et_search);
+        spinnerFilter    = findViewById(R.id.spinner_filter);
+        btnLearn         = findViewById(R.id.btn_learn);
+        btnQuiz          = findViewById(R.id.btn_quiz);
 
         recyclerViewCards.setLayoutManager(new GridLayoutManager(this, 2));
 
@@ -88,28 +73,22 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
                 })
         );
 
-        // Chế độ học (placeholder)
-        btnLearn.setOnClickListener(v ->
-                Toast.makeText(this, "Vào học", Toast.LENGTH_SHORT).show()
-        );
+        btnLearn.setOnClickListener(v -> Toast.makeText(this, "Vào học", Toast.LENGTH_SHORT).show());
 
-        // Chế độ quiz: mở QuizActivity, truyền SET_ID, chặn khi set trống
         btnQuiz.setOnClickListener(v -> {
             if (currentSet.getFlashcards() == null || currentSet.getFlashcards().isEmpty()) {
                 Toast.makeText(this, "Bộ thẻ trống, hãy thêm thẻ trước khi làm quiz!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(SetActivity.this, QuizActivity.class);
-            intent.putExtra("SET_ID", currentSet.getId());
-            intent.putExtra("SET_NAME", currentSet.getName()); // optional
-            startActivity(intent);
+            Intent i = new Intent(SetActivity.this, QuizActivity.class);
+            i.putExtra("SET_ID", currentSet.getId());
+            i.putExtra("SET_NAME", currentSet.getName());
+            startActivity(i);
         });
     }
 
-    @Override
-    protected void onResume() {
+    @Override protected void onResume() {
         super.onResume();
-        // quay lại từ Quiz/Chỉnh sửa thẻ → refresh dữ liệu
         if (currentSet != null) {
             refreshCurrentSet(currentSet.getId());
             loadCards();
@@ -120,10 +99,7 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
         List<FlashcardSet> sets = storageManager.getAllSets();
         currentSet = null;
         for (FlashcardSet set : sets) {
-            if (set.getId().equals(setId)) {
-                currentSet = set;
-                break;
-            }
+            if (set.getId().equals(setId)) { currentSet = set; break; }
         }
     }
 
@@ -150,15 +126,8 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
         String[] types = {"Tất cả", "noun", "verb", "adjective", "adverb"};
         ArrayAdapter<String> adapterFilter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, types);
         spinnerFilter.setAdapter(adapterFilter);
-
         spinnerFilter.setText("Tất cả", false);
-
-        spinnerFilter.setOnItemClickListener((parent, view, position, id) -> {
-            String selected = adapterFilter.getItem(position);
-            spinnerFilter.setText(selected, false);
-            filterCards();
-        });
-
+        spinnerFilter.setOnItemClickListener((p, v, pos, id) -> { spinnerFilter.setText(adapterFilter.getItem(pos), false); filterCards(); });
         spinnerFilter.setOnClickListener(v -> spinnerFilter.showDropDown());
         spinnerFilter.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) spinnerFilter.showDropDown(); });
     }
@@ -170,8 +139,7 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
         filteredList.clear();
         for (Flashcard card : cardList) {
             boolean matchesSearch = card.getName().toLowerCase().contains(query);
-            boolean matchesType = selectedType.equals("Tất cả") ||
-                    card.getType().equalsIgnoreCase(selectedType);
+            boolean matchesType = selectedType.equals("Tất cả") || card.getType().equalsIgnoreCase(selectedType);
             if (matchesSearch && matchesType) filteredList.add(card);
         }
         adapter.updateList(filteredList);
@@ -182,13 +150,13 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
                 .setMessage("Bạn có chắc chắn muốn xóa thẻ này không?")
-                .setPositiveButton("Xóa", (dialog, which) -> {
+                .setPositiveButton("Xóa", (d, w) -> {
                     storageManager.deleteFlashcard(currentSet.getId(), card.getId());
                     refreshCurrentSet(currentSet.getId());
                     loadCards();
                     Toast.makeText(this, "Đã xóa thẻ", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("Hủy", (d, w) -> d.dismiss())
                 .show();
     }
 
