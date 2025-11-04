@@ -1,4 +1,4 @@
-package com.example.flashcard.ui; // Đảm bảo đúng package
+package com.example.flashcard.ui;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
@@ -11,23 +11,21 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import com.example.flashcard.ui.BaseActivity;
-
-
 import com.example.flashcard.R;
 import com.example.flashcard.models.Flashcard;
 import com.example.flashcard.models.FlashcardSet;
 import com.example.flashcard.models.QuizResult;
 import com.example.flashcard.storage.StorageManager;
 
-import java.util.ArrayList; // Thêm import này
+import java.util.ArrayList;
+import java.util.Collections; // Thêm import này cho Collections.shuffle
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,10 +39,12 @@ public class StudyActivity extends BaseActivity {
     private FrameLayout flashcardContainer;
     private Switch switchTrackProgress;
     private LinearLayout navigationUntracked, navigationTracked;
-
-    // Nút điều hướng
-    private Button btnPrevUntracked, btnNextUntracked;
-    private Button btnWrongTracked, btnCorrectTracked;
+    // Đã thêm Progress Bar
+    private ProgressBar progressBarUntracked;
+    private ProgressBar progressBarTracked;
+    // Nút điều hướng (ID đã được đồng bộ với XML mới nhất của bạn)
+    private ImageButton btnPrevUntracked, btnNextUntracked;
+    private ImageButton btnWrongTracked, btnCorrectTracked; // Giữ lại tên cũ để đồng bộ logic track
 
     // Biến cho animation
     private AnimatorSet flipOutAnimator;
@@ -57,6 +57,7 @@ public class StudyActivity extends BaseActivity {
     private FlashcardSet currentSet;
     private List<Flashcard> flashcards;
     private int currentIndex = 0;
+    private int totalCards = 0; // Thêm biến tổng số thẻ
     private boolean isTrackingProgress = true;
     private Set<String> rememberedCardIds;
 
@@ -67,15 +68,19 @@ public class StudyActivity extends BaseActivity {
     private static final long DELAY_FLIP_TO_BACK = 2000; // 2 giây (thời gian xem mặt trước)
     private static final long DELAY_NEXT_CARD = 1500; // 1.5 giây (thời gian xem mặt sau)
 
-    private Button btnPlayUntracked, btnPlayTracked;
-    private Button btnShuffleUntracked, btnShuffleTracked;
+    private ImageButton btnPlayUntracked, btnPlayTracked;
+    private ImageButton btnShuffleUntracked, btnShuffleTracked;
     private ImageView ivStar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // BaseActivity đã gọi setContentView, chỉ cần set tiêu đề
         TextView headerTitle = findViewById(R.id.headerTitle);
-        headerTitle.setText("Study Mode");
+        if (headerTitle != null) {
+            headerTitle.setText("Study Mode");
+        }
+
         // --- Ánh xạ Views (Tìm các view theo ID) ---
         tvFrontWord = findViewById(R.id.tvFrontWord);
         tvFrontType = findViewById(R.id.tvFrontType);
@@ -90,10 +95,18 @@ public class StudyActivity extends BaseActivity {
         switchTrackProgress = findViewById(R.id.switch_track_progress);
         navigationUntracked = findViewById(R.id.navigation_untracked);
         navigationTracked = findViewById(R.id.navigation_tracked);
+
+        // Ánh xạ Progress Bar
+        progressBarUntracked = findViewById(R.id.progress_bar_untracked);
+        progressBarTracked = findViewById(R.id.progress_bar_tracked);
+
+        // Ánh xạ Nút điều hướng
         btnPrevUntracked = findViewById(R.id.btn_prev_card_untracked);
         btnNextUntracked = findViewById(R.id.btn_next_card_untracked);
+        // ID đã được sửa trong XML lần trước, nhưng giữ lại tên biến logic cũ
         btnWrongTracked = findViewById(R.id.btn_wrong_tracked);
         btnCorrectTracked = findViewById(R.id.btn_correct_tracked);
+
         btnPlayUntracked = findViewById(R.id.btn_play_untracked);
         btnPlayTracked = findViewById(R.id.btn_play_tracked);
         btnShuffleUntracked = findViewById(R.id.btn_shuffle_untracked);
@@ -101,19 +114,20 @@ public class StudyActivity extends BaseActivity {
         ivStar = findViewById(R.id.iv_star);
 
         // Nút Get a Hint
-        findViewById(R.id.tv_get_hint).setOnClickListener(v -> showHint());
+        if (tv_get_hint != null) {
+            tv_get_hint.setOnClickListener(v -> showHint());
+        }
 
         // --- Khởi tạo ---
-        storageManager = new StorageManager(this); //
+        storageManager = new StorageManager(this);
         loadAnimations(); // Gọi hàm tải animation
 
         // --- Lấy dữ liệu thẻ ---
         Intent intent = getIntent();
-        String setIdToStudy = intent.getStringExtra("SET_ID_TO_STUDY"); // Nhận ID từ SetActivity
+        String setIdToStudy = intent.getStringExtra("SET_ID_TO_STUDY");
 
         if (setIdToStudy != null) {
-            // Dùng StorageManager để lấy Set dựa trên ID
-            List<FlashcardSet> allSets = storageManager.getAllSets(); //
+            List<FlashcardSet> allSets = storageManager.getAllSets();
             for (FlashcardSet set : allSets) {
                 if (set.getId().equals(setIdToStudy)) {
                     currentSet = set;
@@ -125,129 +139,108 @@ public class StudyActivity extends BaseActivity {
         // Kiểm tra xem Set và thẻ có tồn tại không
         if (currentSet == null || currentSet.getFlashcards() == null || currentSet.getFlashcards().isEmpty()) {
             Toast.makeText(this, "Lỗi: Bộ thẻ này trống hoặc không tồn tại.", Toast.LENGTH_LONG).show();
-            finish(); // Đóng activity nếu lỗi
+            finish();
             return;
         }
         flashcards = currentSet.getFlashcards();
+        totalCards = flashcards.size(); // Thiết lập tổng số thẻ
 
-// Kiểm tra xem Set và thẻ có tồn tại không
-        if (currentSet == null || currentSet.getFlashcards() == null || currentSet.getFlashcards().isEmpty()) {
-            Toast.makeText(this, "Lỗi: Bộ thẻ này trống hoặc không tồn tại.", Toast.LENGTH_LONG).show();
-            finish(); // Đóng activity nếu lỗi
-            return;
-        }
-        flashcards = currentSet.getFlashcards();
-
-
-        // --- BẮT ĐẦU KHỐI DÁN (PASTE) VÀO ĐÂY ---
-
-        // 1. Tải danh sách đã nhớ (Dán từ dòng 113)
+        // --- Tải dữ liệu đã lưu ---
         rememberedCardIds = storageManager.getRememberedCards(currentSet.getId());
-
-        // 2. Tải vị trí đã lưu (Dán từ dòng 142)
         int savedIndex = storageManager.getStudyProgress(currentSet.getId());
 
         // Kiểm tra xem index có hợp lệ không
-        if (savedIndex > 0 && savedIndex < flashcards.size()) {
+        if (savedIndex >= 0 && savedIndex < flashcards.size()) {
             currentIndex = savedIndex; // Cập nhật vị trí bắt đầu
         } else {
-            currentIndex = 0; // Nếu không có hoặc không hợp lệ, bắt đầu từ 0
+            currentIndex = 0; // Bắt đầu từ 0
         }
 
-        // --- KẾT THÚC KHỐI DÁN ---
-
-
-        // --- Thiết lập ban đầu --- (Dòng 152 trong code cũ của bạn)
-        isTrackingProgress = switchTrackProgress.isChecked();
-        updateNavigationUI();
-        loadFlashcard(currentIndex); // Dòng này giờ sẽ dùng currentIndex và rememberedCardIds đã được tải
-
-
         // --- Thiết lập ban đầu ---
-        isTrackingProgress = switchTrackProgress.isChecked(); // Lấy trạng thái ban đầu
-        updateNavigationUI(); // Hiển thị bộ nút điều khiển phù hợp
-        loadFlashcard(currentIndex); // Hiển thị thẻ đầu tiên
+        isTrackingProgress = switchTrackProgress.isChecked();
+
+        // Thiết lập MAX cho Progress Bar
+        progressBarUntracked.setMax(totalCards);
+        progressBarTracked.setMax(totalCards);
+
+        updateNavigationUI();
+        loadFlashcard(currentIndex); // Tải thẻ đầu tiên
 
         // --- Gán sự kiện Click ---
-        flashcardContainer.setOnClickListener(v -> flipCard()); // Lật thẻ khi nhấn vào
+        flashcardContainer.setOnClickListener(v -> flipCard());
 
         // Bật/tắt Track Progress
         switchTrackProgress.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isTrackingProgress = isChecked;
-            updateNavigationUI(); // Đổi bộ nút
-            updateProgressUI(); // Cập nhật text tiến trình
+            updateNavigationUI();
+            updateProgressUI(); // Cập nhật text & Progress Bar
             if (isTrackingProgress) {
                 rememberedCardIds.clear(); // Reset bộ đếm khi bật tracking
                 storageManager.saveRememberedCards(currentSet.getId(), rememberedCardIds);
             }
         });
 
-        //Nút điều hướng khi KHÔNG track
+        // Nút điều hướng khi KHÔNG track (Prev/Next)
         btnPrevUntracked.setOnClickListener(v -> goToPrevCard());
-        btnNextUntracked.setOnClickListener(v -> goToNextCard());
+        btnNextUntracked.setOnClickListener(v -> goToNextCard(false)); // False: không đánh dấu là đúng
 
-        // Nút điều hướng khi CÓ track
-        btnWrongTracked.setOnClickListener(v -> goToNextCard()); // Sai thì chỉ cần qua thẻ mới
+        // Nút điều hướng khi CÓ track (Wrong/Correct)
+        btnWrongTracked.setOnClickListener(v -> goToNextCard(false)); // Sai thì chỉ cần qua thẻ mới
         btnCorrectTracked.setOnClickListener(v -> {
             rememberedCardIds.add(flashcards.get(currentIndex).getId()); // Đánh dấu đã nhớ
-            goToNextCard(); // Qua thẻ mới
+            goToNextCard(true); // Qua thẻ mới
         });
 
+        // Auto-play setup
         playHandler = new Handler(getMainLooper());
-        initPlayRunnable(); // Gọi hàm này để tạo Runnable
+        initPlayRunnable();
 
-        // Gán sự kiện cho 2 nút Play
         View.OnClickListener playClickListener = v -> togglePlayMode();
         btnPlayUntracked.setOnClickListener(playClickListener);
         btnPlayTracked.setOnClickListener(playClickListener);
 
-        // Gán sự kiện cho 2 nút Shuffle
         View.OnClickListener shuffleClickListener = v -> shuffleCards();
         btnShuffleUntracked.setOnClickListener(shuffleClickListener);
         btnShuffleTracked.setOnClickListener(shuffleClickListener);
 
-        ivStar = findViewById(R.id.iv_star);
         ivStar.setOnClickListener(v -> toggleStarStatus());
     }
 
     // --- Các hàm xử lý ---
 
-    // Tải animation từ file animator
     private void loadAnimations() {
+        // ... (Giữ nguyên logic loadAnimations)
         flipOutAnimator = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_out);
         flipInAnimator = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_in);
-        // Thiết lập camera distance để hiệu ứng 3D đẹp hơn
         float scale = getResources().getDisplayMetrics().density;
         cardFront.setCameraDistance(8000 * scale);
         cardBack.setCameraDistance(8000 * scale);
     }
 
-    // Hiển thị dữ liệu của thẻ lên giao diện
     private void loadFlashcard(int index) {
-        Flashcard fc = flashcards.get(index); //
+        // ... (Giữ nguyên logic loadFlashcard)
+        Flashcard fc = flashcards.get(index);
         tvFrontWord.setText(fc.getName());
         tvFrontType.setText(fc.getType() != null && !fc.getType().isEmpty() ? "[" + fc.getType() + "]" : "");
         tvBackMeaning.setText(fc.getMeaning());
 
-        tv_get_hint.setText("Get a hint");
-        hintShown = false; // Reset trạng thái hint
+        tv_get_hint.setText("💡 Get a hint");
+        hintShown = false;
 
-        updateProgressUI(); // Cập nhật text số thẻ (ví dụ: 1 / 10)
-        resetCardFlip(); // Luôn quay về mặt trước
+        updateProgressUI();
+        resetCardFlip();
         updateStarIcon();
     }
 
-    // Thực hiện animation lật thẻ
     private void flipCard() {
-        //tv_get_hint.setVisibility(View.GONE); // Ẩn hint khi lật
-
-        if (isFrontVisible) { // Đang thấy mặt trước -> Lật ra sau
+        // ... (Giữ nguyên logic flipCard)
+        if (isFrontVisible) {
             flipOutAnimator.setTarget(cardFront);
             flipInAnimator.setTarget(cardBack);
             flipOutAnimator.start();
             flipInAnimator.start();
             isFrontVisible = false;
-        } else { // Đang thấy mặt sau -> Lật ra trước
+        } else {
             flipOutAnimator.setTarget(cardBack);
             flipInAnimator.setTarget(cardFront);
             flipOutAnimator.start();
@@ -256,20 +249,28 @@ public class StudyActivity extends BaseActivity {
         }
     }
 
-    // Chuyển sang thẻ tiếp theo
-    private void goToNextCard() {
-        currentIndex++; // Tăng chỉ số thẻ
-        updateProgressUI(); // Cập nhật số thẻ (ví dụ: 2 / 10)
+    /**
+     * Chuyển sang thẻ tiếp theo.
+     * @param isCorrected Trong chế độ tracked, thẻ hiện tại có được đánh dấu là đúng không.
+     */
+    private void goToNextCard(boolean isCorrected) {
+        if (isCorrected && isTrackingProgress) {
+            // Logic đánh dấu đã được xử lý ở setOnClickListener
+        }
 
-        if (currentIndex < flashcards.size()) { // Nếu chưa hết thẻ
-            loadFlashcard(currentIndex); // Tải thẻ tiếp theo
-        } else { // Nếu đã hết thẻ
+        currentIndex++;
+
+        if (currentIndex < flashcards.size()) {
+            loadFlashcard(currentIndex);
+        } else {
+            // Đã hết thẻ
             if (isTrackingProgress) {
-                finishStudyAndSave(); // Lưu kết quả nếu đang track
+                finishStudyAndSave();
             } else {
-                showCompletionDialog(false); // Chỉ thông báo nếu không track
+                showCompletionDialog(false);
             }
         }
+        // updateProgressUI() được gọi trong loadFlashcard
     }
 
     // Quay lại thẻ trước đó (chỉ dùng khi không track)
@@ -279,24 +280,33 @@ public class StudyActivity extends BaseActivity {
         } else {
             currentIndex = flashcards.size() - 1; // Quay vòng về thẻ cuối
         }
-        loadFlashcard(currentIndex); // Tải lại thẻ
+        loadFlashcard(currentIndex);
+        // Khi quay lại thẻ trước, nếu thẻ đó đã được nhớ, loại bỏ khỏi rememberedCardIds
+        if (isTrackingProgress && rememberedCardIds.contains(flashcards.get(currentIndex).getId())) {
+            rememberedCardIds.remove(flashcards.get(currentIndex).getId());
+        }
     }
 
-    // Hiển thị gợi ý (lấy ký tự đầu của nghĩa)
     private void showHint() {
+        // ... (Giữ nguyên logic showHint)
         if (flashcards == null || flashcards.isEmpty() || hintShown) return;
 
         String meaning = flashcards.get(currentIndex).getMeaning();
-        if (meaning != null && !meaning.isEmpty()) {
-            String hintText = "Hint: " + meaning.charAt(0) + meaning.charAt(1)+"...";
+        if (meaning != null && meaning.length() >= 2) { // Đảm bảo có ít nhất 2 ký tự
+            String hintText = "Hint: " + meaning.charAt(0) + meaning.charAt(1) + "...";
             tv_get_hint.setText(hintText);
-            tv_get_hint.setVisibility(View.VISIBLE); // Hiện TextView hint
+            tv_get_hint.setVisibility(View.VISIBLE);
+            hintShown = true;
+        } else if (meaning != null && meaning.length() == 1) {
+            String hintText = "Hint: " + meaning.charAt(0) + "...";
+            tv_get_hint.setText(hintText);
+            tv_get_hint.setVisibility(View.VISIBLE);
             hintShown = true;
         }
     }
 
-    // Đổi bộ nút điều khiển dựa vào Switch
     private void updateNavigationUI() {
+        // ... (Giữ nguyên logic updateNavigationUI)
         if (isTrackingProgress) {
             navigationTracked.setVisibility(View.VISIBLE);
             navigationUntracked.setVisibility(View.GONE);
@@ -308,75 +318,76 @@ public class StudyActivity extends BaseActivity {
         }
     }
 
-    // Cập nhật các TextView hiển thị tiến trình
+    /**
+     * Cập nhật các TextView và ProgressBar hiển thị tiến trình
+     */
     private void updateProgressUI() {
-        String progressText = (currentIndex + 1) + " / " + flashcards.size();
+        // Tiền xử lý để tránh chia cho 0 nếu danh sách rỗng (đã được kiểm tra trong onCreate)
+        if (totalCards == 0) return;
+
+        // Tiến độ hiện tại (1-based index)
+        int currentProgress = currentIndex + 1;
+
+        String progressText = currentProgress + " / " + totalCards;
+
+        // 1. Cập nhật TextView
         tvCardProgressUntracked.setText(progressText);
         tvCardProgressTracked.setText(progressText);
 
+        // 2. Cập nhật ProgressBar (Sử dụng giá trị thực tế của currentIndex + 1)
         if (isTrackingProgress) {
+            progressBarTracked.setProgress(currentProgress);
+            progressBarUntracked.setProgress(0); // Ẩn thanh kia
             tvRememberedCount.setText("Remembered: " + rememberedCardIds.size());
+        } else {
+            progressBarUntracked.setProgress(currentProgress);
+            progressBarTracked.setProgress(0); // Ẩn thanh kia
+            tvRememberedCount.setVisibility(View.GONE);
         }
     }
 
     private void resetCardFlip() {
+        // ... (Giữ nguyên logic resetCardFlip)
         isFrontVisible = true;
-
-        // Luôn để cả 2 thẻ ở trạng thái VISIBLE
         cardFront.setVisibility(View.VISIBLE);
         cardBack.setVisibility(View.VISIBLE);
-
-        // Dùng ALPHA (độ mờ) để ẩn/hiện
-        cardFront.setAlpha(1f); // 1f = Hiện rõ
+        cardFront.setAlpha(1f);
         cardFront.setRotationY(0f);
-
-        cardBack.setAlpha(0f);  // 0f = Ẩn (trong suốt)
+        cardBack.setAlpha(0f);
         cardBack.setRotationY(0f);
     }
 
-    //Xáo trộn danh sách thẻ hiện tại và quay về thẻ đầu tiên
     private void shuffleCards() {
         if (isPlaying) {
-            stopPlayMode(); // Dừng auto-play nếu đang chạy
+            stopPlayMode();
         }
 
-        // Dùng Collections để xáo trộn danh sách
-        java.util.Collections.shuffle(flashcards);
+        Collections.shuffle(flashcards); // Sử dụng import java.util.Collections
+        rememberedCardIds.clear(); // Xóa trạng thái nhớ khi xáo trộn
 
-        currentIndex = 0; // Quay về thẻ đầu
-        loadFlashcard(currentIndex); // Tải lại thẻ
+        currentIndex = 0;
+        loadFlashcard(currentIndex);
 
         Toast.makeText(this, "Đã xáo trộn thẻ!", Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * Khởi tạo vòng lặp (Runnable) cho chế độ tự động phát.
-     */
     private void initPlayRunnable() {
         playRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!isPlaying) return; // Đã bị dừng thủ công
+                if (!isPlaying) return;
 
                 if (isFrontVisible) {
-                    // --- ĐANG Ở MẶT TRƯỚC ---
-                    // Lật ra mặt sau
                     flipCard();
-                    // Hẹn giờ chạy lại Runnable này sau [DELAY_NEXT_CARD] (để xem mặt sau)
                     playHandler.postDelayed(this, DELAY_NEXT_CARD);
                 } else {
-                    // --- ĐANG Ở MẶT SAU ---
-                    // Kiểm tra xem đây có phải thẻ cuối cùng không
                     if (currentIndex < flashcards.size() - 1) {
-                        // Nếu chưa phải thẻ cuối, chuyển thẻ tiếp theo
-                        goToNextCard(); // Hàm này sẽ tự động reset về mặt trước
-                        // Hẹn giờ chạy lại Runnable này sau [DELAY_FLIP_TO_BACK] (để xem mặt trước)
+                        // Chuyển thẻ tiếp theo. False vì auto-play không tự đánh dấu là Correct
+                        goToNextCard(false);
                         playHandler.postDelayed(this, DELAY_FLIP_TO_BACK);
                     } else {
-                        // Nếu ĐÂY LÀ THẺ CUỐI CÙNG
                         Toast.makeText(StudyActivity.this, "Đã phát hết thẻ!", Toast.LENGTH_SHORT).show();
                         stopPlayMode();
-                        // Tùy chọn: Quay về thẻ đầu tiên sau khi kết thúc
                         currentIndex = 0;
                         loadFlashcard(currentIndex);
                     }
@@ -385,80 +396,74 @@ public class StudyActivity extends BaseActivity {
         };
     }
 
-    //Bật hoặc Tắt chế độ tự động phát
     private void togglePlayMode() {
         if (isPlaying) {
             stopPlayMode();
         } else {
+            // Nếu thẻ đang ở mặt sau, lật lại mặt trước trước khi bắt đầu
+            if (!isFrontVisible) {
+                flipCard();
+            }
             startPlayMode();
         }
     }
 
-    //Bắt đầu chế độ tự động phát
     private void startPlayMode() {
         isPlaying = true;
-        btnPlayUntracked.setText("■"); // Biểu tượng Stop
-        btnPlayTracked.setText("■"); // Biểu tượng Stop
+        btnPlayUntracked.setImageResource(R.drawable.ic_stop);
+        btnPlayTracked.setImageResource(R.drawable.ic_stop);
 
-        // Khóa các nút điều khiển khác khi đang auto-play
         disableControlsForPlay(false);
 
-        // Bắt đầu vòng lặp (hiển thị mặt trước trong [DELAY_FLIP_TO_BACK] giây)
         playHandler.postDelayed(playRunnable, DELAY_FLIP_TO_BACK);
     }
 
-    //Dừng chế độ tự động phát
     private void stopPlayMode() {
         isPlaying = false;
-        playHandler.removeCallbacks(playRunnable); // Hủy mọi lịch hẹn chạy
-        btnPlayUntracked.setText("▶"); // Biểu tượng Play
-        btnPlayTracked.setText("▶"); // Biểu tượng Play
+        playHandler.removeCallbacks(playRunnable);
+        btnPlayUntracked.setImageResource(R.drawable.ic_play);
+        btnPlayTracked.setImageResource(R.drawable.ic_play);
 
-        // Mở lại các nút điều khiển
         disableControlsForPlay(true);
     }
 
-    //Hàm tiện ích để khóa/mở các nút điều khiển khi đang auto-play
     private void disableControlsForPlay(boolean enabled) {
-        // (Untracked)
+        // ... (Giữ nguyên logic disableControlsForPlay)
         btnPrevUntracked.setEnabled(enabled);
         btnNextUntracked.setEnabled(enabled);
         btnShuffleUntracked.setEnabled(enabled);
-        // (Tracked)
+
         btnWrongTracked.setEnabled(enabled);
         btnCorrectTracked.setEnabled(enabled);
         btnShuffleTracked.setEnabled(enabled);
-        // Chung
+
         flashcardContainer.setEnabled(enabled);
         switchTrackProgress.setEnabled(enabled);
-        tv_get_hint.setEnabled(enabled);
+        if(tv_get_hint != null) tv_get_hint.setEnabled(enabled);
     }
 
-    // Kết thúc học và LƯU KẾT QUẢ (chỉ khi tracking)
     private void finishStudyAndSave() {
+        // ... (Giữ nguyên logic finishStudyAndSave)
         int totalCards = flashcards.size();
         int rememberedCount = rememberedCardIds.size();
 
-        // Tạo đối tượng kết quả
         QuizResult result = new QuizResult(currentSet.getId(), totalCards, rememberedCount);
 
-        // Lấy danh sách kết quả cũ (nếu có) và thêm kết quả mới
         List<QuizResult> results = currentSet.getQuizResults();
         if (results == null) {
-            results = new ArrayList<>(); // Khởi tạo nếu chưa có
+            results = new ArrayList<>();
         }
         results.add(result);
-        currentSet.setQuizResults(results); //
+        currentSet.setQuizResults(results);
 
-        // Lưu lại Set đã cập nhật vào SharedPreferences
         storageManager.updateSet(currentSet);
         storageManager.saveStudyProgress(currentSet.getId(), 0);
         storageManager.saveRememberedCards(currentSet.getId(), new HashSet<>());
-        showCompletionDialog(true); // Hiển thị thông báo có kết quả
+        showCompletionDialog(true);
     }
 
-    // Hiển thị Dialog báo cáo kết quả
     private void showCompletionDialog(boolean wasTracked) {
+        // ... (Giữ nguyên logic showCompletionDialog)
         String message;
         if (wasTracked) {
             message = "Bạn đã học xong.\nKết quả: Đã nhớ " + rememberedCardIds.size() + " / " + flashcards.size() + " thẻ.\nXem thống kê";
@@ -469,69 +474,58 @@ public class StudyActivity extends BaseActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Hoàn thành!")
                 .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> finish()) // Đóng StudyActivity
+                .setPositiveButton("OK", (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
     }
 
-    // Hàm tạm để test (xóa sau)
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
     @Override
     protected void onStop() {
         super.onStop();
-        // Luôn dừng auto-play khi thoát khỏi màn hình
         if (isPlaying) {
             stopPlayMode();
         }
     }
 
-    /**
-     * Xử lý khi người dùng nhấn vào nút ngôi sao.
-     */
     private void toggleStarStatus() {
+        // ... (Giữ nguyên logic toggleStarStatus)
         if (flashcards == null || flashcards.isEmpty()) return;
 
         String currentCardId = flashcards.get(currentIndex).getId();
         boolean isCurrentlyStarred = storageManager.isCardStarred(currentCardId);
 
-        // Lật trạng thái
         if (isCurrentlyStarred) {
-            // Đang yêu thích -> Bỏ yêu thích
             storageManager.removeStarredCard(currentCardId);
             Toast.makeText(this, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
         } else {
-            // Chưa yêu thích -> Thêm yêu thích
             storageManager.addStarredCard(currentCardId);
             Toast.makeText(this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
         }
 
-        // Cập nhật lại icon ngay lập tức
         updateStarIcon();
     }
-    /**
-     * Cập nhật giao diện (icon) của ngôi sao dựa trên trạng thái của thẻ hiện tại.
-     */
+
     private void updateStarIcon() {
+        // ... (Giữ nguyên logic updateStarIcon)
         if (flashcards == null || flashcards.isEmpty()) return;
 
         String currentCardId = flashcards.get(currentIndex).getId();
 
+        // Bạn cần đảm bảo các drawable này tồn tại trong dự án của bạn
         if (storageManager.isCardStarred(currentCardId)) {
             ivStar.setImageResource(R.drawable.ic_star_filled_yellow);
         } else {
             ivStar.setImageResource(R.drawable.ic_star_border_grey);
         }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
-        // Dừng auto-play nếu đang chạy
+        // ... (Giữ nguyên logic onPause)
         if (isPlaying) {
             stopPlayMode();
         }
-        // Lưu vị trí hiện tại vào StorageManager
         if (currentSet != null) {
             storageManager.saveStudyProgress(currentSet.getId(), currentIndex);
             storageManager.saveRememberedCards(currentSet.getId(), rememberedCardIds);
@@ -547,6 +541,4 @@ public class StudyActivity extends BaseActivity {
     protected String getHeaderTitle() {
         return "Study Mode";
     }
-
-
 }

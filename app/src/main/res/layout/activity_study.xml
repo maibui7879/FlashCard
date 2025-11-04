@@ -11,63 +11,68 @@
         android:id="@+id/top_controls_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
         android:orientation="horizontal"
         android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
         <TextView
             android:id="@+id/tv_get_hint"
-            android:layout_width="228dp"
-            android:layout_height="76dp"
-            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:drawablePadding="8dp"
             android:focusable="true"
-            android:text="💡 Get a hint"
+            android:text="Get a hint"
             android:textColor="@android:color/black"
-            android:textSize="22sp"
+            android:textSize="18sp"
             tools:ignore="UseCompatTextViewDrawableXml" />
 
-        <ImageView
-            android:id="@+id/iv_edit"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:color="#FF000000"
-            android:contentDescription="Edit"
-            android:focusable="true"
-            android:src="@drawable/edit" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/iv_volume"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="Volume"
-            android:focusable="true"
-            android:src="@drawable/ic_volume" />
+            <ImageView
+                android:id="@+id/iv_edit"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Edit"
+                android:focusable="true"
+                android:src="@drawable/edit"
+                app:tint="@color/blue_primary" />
 
-        <ImageView
-            android:id="@+id/iv_star"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="Star"
-            android:focusable="true"
-            android:src="@drawable/ic_star" />
+            <ImageView
+                android:id="@+id/iv_volume"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Volume"
+                android:focusable="true"
+                android:src="@drawable/ic_volume"
+                app:tint="@color/blue_primary" />
 
+            <ImageView
+                android:id="@+id/iv_star"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Star"
+                android:focusable="true"
+                android:src="@drawable/ic_star"
+                app:tint="@color/blue_primary" />
+        </LinearLayout>
     </LinearLayout>
 
     <FrameLayout
@@ -77,7 +82,6 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_controls_layout"
         app:layout_constraintDimensionRatio="H,4:3"
         app:layout_constraintEnd_toEndOf="parent"
@@ -85,12 +89,14 @@
         app:layout_constraintTop_toBottomOf="@+id/top_controls_layout"
         app:layout_constraintVertical_bias="0.4">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_front"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:cardCornerRadius="26dp"
-            app:cardElevation="8dp">
+            app:cardElevation="0dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/blue_primary">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -114,15 +120,17 @@
                     android:textColor="@android:color/darker_gray"
                     android:textSize="20sp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0"
             app:cardCornerRadius="26dp"
-            app:cardElevation="8dp">
+            app:cardElevation="0dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/blue_primary">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -136,32 +144,30 @@
                     android:text="Meaning"
                     android:textColor="@android:color/black"
                     android:textSize="28sp" />
-
-
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_controls_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="88dp"
+        android:layout_marginBottom="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:id="@+id/track_progress_section"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/navigation_actions_container"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -181,26 +187,25 @@
                 android:minHeight="0dp"
                 android:thumbTint="@color/blue_primary"
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            <TextView
+                android:id="@+id/tvRememberedCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textColor="@color/blue_primary"
+                android:textSize="14sp"
+                android:visibility="visible"
+                tools:text="Remembered: 5" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvRememberedCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:textColor="@color/blue_primary"
-            android:textSize="14sp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@id/track_progress_section"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/track_progress_section"
-            tools:text="Remembered: 5" />
 
         <FrameLayout
             android:id="@+id/navigation_actions_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -210,142 +215,312 @@
                 android:id="@+id/navigation_untracked"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:visibility="gone">
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btn_prev_card_untracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Previous Card"
-                    android:text="⬅️" />
-
-                <TextView
-                    android:id="@+id/tv_card_progress_untracked"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="6 / 477"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btn_next_card_untracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Next Card"
-                    android:text="➡️" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                <Button
-                    android:id="@+id/btn_play_untracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Play"
-                    android:text="▶️" />
+                        <ImageButton
+                            android:id="@+id/btn_prev_card_untracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Previous Card"
+                            android:src="@drawable/btn_prev"
+                            app:tint="@color/blue_primary" />
 
-                <Button
-                    android:id="@+id/btn_shuffle_untracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Shuffle"
-                    android:text="🔀" />
+                        <TextView
+                            android:id="@+id/tv_card_progress_untracked"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="6 / 477"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold"/>
 
-                <Button
-                    android:id="@+id/btn_settings_untracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Settings"
-                    android:text="⚙️" />
+                        <ImageButton
+                            android:id="@+id/btn_next_card_untracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Next Card"
+                            android:src="@drawable/btn_next"
+                            app:tint="@color/blue_primary" />
+                    </LinearLayout>
 
-                <ImageButton
-                    android:id="@+id/btn_fullscreen_untracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:contentDescription="Fullscreen"
-                    android:src="@drawable/fullscreen" />
+                    <ProgressBar
+                        android:id="@+id/progress_bar_untracked"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:max="100"
+                        android:progress="10"
+                        android:progressTint="@color/blue_primary" />
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_play_untracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Play"
+                            android:src="@drawable/ic_play"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tự động chạy"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_shuffle_untracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Shuffle"
+                            android:src="@drawable/ic_shuffle"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Shuffle"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_settings_untracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Settings"
+                            android:src="@drawable/ic_setting"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cài đặt"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_fullscreen_untracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Fullscreen"
+                            android:src="@drawable/ic_full_screen"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Toàn màn hình"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/navigation_tracked"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
                 android:visibility="visible">
 
-                <Button
-                    android:id="@+id/btn_wrong_tracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Wrong"
-                    android:text="❌"
-                    app:tint="#FF5252" />
-
-                <TextView
-                    android:id="@+id/tv_card_progress_tracked"
-                    android:layout_width="7dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:gravity="center"
-                    android:text="7 / 477"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btn_correct_tracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Correct"
-                    android:text="✅"
-                    app:tint="#4CAF50" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                <Button
-                    android:id="@+id/btn_play_tracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Play"
-                    android:text="▶️" />
+                        <ImageButton
+                            android:id="@+id/btn_wrong_tracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Previous Card"
+                            android:src="@drawable/ic_wrong"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:id="@+id/tv_card_progress_tracked"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="7 / 477"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold"/>
 
-                <Button
-                    android:id="@+id/btn_shuffle_tracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Shuffle"
-                    android:text="🔀" />
+                        <ImageButton
+                            android:id="@+id/btn_correct_tracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Next Card"
+                            android:src="@drawable/ic_correct"
+                            app:tint="@color/blue_primary" />
+                    </LinearLayout>
 
-                <Button
-                    android:id="@+id/btn_settings_tracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Settings"
-                    android:text="⚙️" />
+                    <ProgressBar
+                        android:id="@+id/progress_bar_tracked"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:max="100"
+                        android:progress="20"
+                        android:progressTint="@color/blue_primary" />
 
-                <ImageButton
-                    android:id="@+id/btn_fullscreen_tracked"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:contentDescription="Fullscreen"
-                    android:src="@drawable/fullscreen" />
+                </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_play_tracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Play"
+                            android:src="@drawable/ic_play"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tự động chạy"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_shuffle_tracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Shuffle"
+                            android:src="@drawable/ic_shuffle"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Shuffle"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_settings_tracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Settings"
+                            android:src="@drawable/ic_setting"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cài đặt"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <ImageButton
+                            android:id="@+id/btn_fullscreen_tracked"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Fullscreen"
+                            android:src="@drawable/ic_full_screen"
+                            app:tint="@color/blue_primary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Toàn màn hình"
+                            android:textSize="12sp"
+                            android:textColor="@color/blue_primary" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
