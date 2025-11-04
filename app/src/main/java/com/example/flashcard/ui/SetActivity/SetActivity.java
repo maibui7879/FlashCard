@@ -19,6 +19,7 @@ import com.example.flashcard.models.Flashcard;
 import com.example.flashcard.models.FlashcardSet;
 import com.example.flashcard.storage.StorageManager;
 import com.example.flashcard.ui.BaseActivity;
+import com.example.flashcard.ui.QuizActivity;
 import com.example.flashcard.ui.StudyActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -95,7 +96,16 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
             }
         });
         // xu li che do quiz ơ day
-        btnQuiz.setOnClickListener(v -> Toast.makeText(this, "Vào quiz", Toast.LENGTH_SHORT).show());
+        btnQuiz.setOnClickListener(v -> {
+            if (currentSet.getFlashcards() == null || currentSet.getFlashcards().isEmpty()) {
+                Toast.makeText(this, "Bộ thẻ trống, hãy thêm thẻ trước khi làm quiz!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent i = new Intent(SetActivity.this, QuizActivity.class);
+            i.putExtra("SET_ID", currentSet.getId());
+            i.putExtra("SET_NAME", currentSet.getName());
+            startActivity(i);
+        });
     }
 
     private void refreshCurrentSet(String setId) {

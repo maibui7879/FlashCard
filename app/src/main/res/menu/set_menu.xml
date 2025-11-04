@@ -1,5 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/action_history"
+        android:title="Lịch sử quiz" />
+    <item
         android:id="@+id/action_edit"
         android:title="Sửa"/>
     <item

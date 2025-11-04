@@ -76,7 +76,6 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
         startActivity(intent);
     }
 
-
     @Override
     public void onMenuClick(FlashcardSet set, View menuView) {
         PopupMenu popup = new PopupMenu(this, menuView);
@@ -84,12 +83,20 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
 
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.action_edit) {
-                // Mở SetActivity và truyền id của set
+            if (itemId == R.id.action_history) {
+                // ➜ mở màn lịch sử quiz cho bộ này
+                Intent i = new Intent(SetListActivity.this, QuizHistoryActivity.class);
+                i.putExtra("SET_ID", set.getId());
+                i.putExtra("SET_NAME", set.getName());
+                startActivity(i);
+                return true;
+
+            } else if (itemId == R.id.action_edit) {
                 Intent intent = new Intent(SetListActivity.this, SetActivity.class);
                 intent.putExtra("SET_ID", set.getId());
                 startActivity(intent);
                 return true;
+
             } else if (itemId == R.id.action_delete) {
                 storageManager.deleteSet(set.getId());
                 loadSets();
@@ -100,7 +107,6 @@ public class SetListActivity extends BaseActivity implements FlashcardSetAdapter
         });
         popup.show();
     }
-
 
     private void showCreateSetDialog() {
         final Dialog dialog = new Dialog(this);

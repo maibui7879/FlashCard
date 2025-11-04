@@ -14,11 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FlashCard">
         <activity
-            android:name=".ui.StudyActivity"
+            android:name=".ui.QuizHistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.DictionaryActivity"
+            android:name=".ui.QuizResultActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.QuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.StudyActivity"
+            android:exported="false" /> <!-- <activity -->
+        <!-- android:name=".ui.DictionaryActivity" -->
+        <!-- android:exported="false" /> -->
         <activity
             android:name=".ui.SetActivity.SetActivity"
             android:exported="false" />
