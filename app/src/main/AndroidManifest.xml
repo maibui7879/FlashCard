@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Dùng API tra cứu nghĩa nên cần Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,18 +14,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlashCard">
+
+        <!-- MÀN HÌNH MỞ ĐẦU: Danh sách Bộ thẻ -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.SetListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.QuizActivity" android:exported="false"/>
-        <activity android:name=".ui.QuizResultActivity" android:exported="false"/>
-        <activity android:name=".ui.QuizHistoryActivity" android:exported="false"/>
-    </application>
 
+        <!-- Màn hình chi tiết 1 bộ thẻ -->
+        <activity
+            android:name=".ui.SetActivity.SetActivity"
+            android:exported="false" />
+
+        <!-- Quiz -->
+        <activity
+            android:name=".ui.QuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.QuizResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.QuizHistoryActivity"
+            android:exported="false" />
+
+        <!-- MainActivity (không còn là launcher, vẫn khai báo nếu còn dùng nội bộ) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+    </application>
 </manifest>
