@@ -13,6 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlashCard">
+
+        <activity
+            android:name=".ui.DashboardActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.QuizHistoryActivity"
             android:exported="false" />
@@ -24,27 +28,25 @@
             android:exported="false" />
         <activity
             android:name=".ui.StudyActivity"
-            android:exported="false" /> <!-- <activity -->
-        <!-- android:name=".ui.DictionaryActivity" -->
-        <!-- android:exported="false" /> -->
+            android:exported="false" />
         <activity
             android:name=".ui.SetActivity.SetActivity"
             android:exported="false" />
         <activity
             android:name=".ui.BaseActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.SetListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+
+        <activity
+            android:name=".ui.SetListActivity"
+            android:exported="false" /> </application>
 
 </manifest>

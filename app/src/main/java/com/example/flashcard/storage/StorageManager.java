@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class StorageManager {
@@ -265,6 +266,12 @@ public class StorageManager {
         allProgress.put(setId, cardIds); // Cập nhật danh sách
         String json = gson.toJson(allProgress);
         sharedPreferences.edit().putString(KEY_REMEMBERED_CARDS, json).apply();
+    }
+
+    public Collection<Object> getAllCards(String id) {
+        // Chuyển List<Flashcard> sang Collection<Object>
+        List<Flashcard> cards = getFlashcards(id);
+        return new ArrayList<>(cards);
     }
 
 }

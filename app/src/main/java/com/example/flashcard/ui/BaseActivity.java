@@ -33,7 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Chú ý: Cần đảm bảo MainActivity và SetListActivity đã tồn tại
         navHome.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
         navFlashcard.setOnClickListener(v -> startActivity(new Intent(this, SetListActivity.class)));
-        navUser.setOnClickListener(v -> startActivity(new Intent(this, SetListActivity.class)));
+        navUser.setOnClickListener(v -> startActivity(new Intent(this, DashboardActivity.class)));
     }
 
     protected abstract String getHeaderTitle();
