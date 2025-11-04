@@ -65,6 +65,14 @@ public class EditCardDialog {
         etAns1.setEnabled(false); // đáp án đúng không edit
         etType.setText(card.getType());
 
+        // set các đáp án sai cũ
+        List<String> wrongAnswers = card.getAnswers();
+        if (wrongAnswers != null && wrongAnswers.size() >= 3) {
+            etAns2.setText(wrongAnswers.get(0));
+            etAns3.setText(wrongAnswers.get(1));
+            etAns4.setText(wrongAnswers.get(2));
+        }
+
         String[] types = {"noun", "verb", "adjective", "adverb", "phrase", "other"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, types);
         etType.setAdapter(adapter);
@@ -138,16 +146,15 @@ public class EditCardDialog {
                 return;
             }
 
-            // lưu chỉ 3 đáp án sai
-            List<String> wrongAnswers = new ArrayList<>();
-            wrongAnswers.add(ans2);
-            wrongAnswers.add(ans3);
-            wrongAnswers.add(ans4);
+            List<String> newWrongAnswers = new ArrayList<>();
+            newWrongAnswers.add(ans2);
+            newWrongAnswers.add(ans3);
+            newWrongAnswers.add(ans4);
 
             card.setName(name);
             card.setMeaning(meaning);
             card.setType(type.isEmpty() ? "other" : type);
-            card.setAnswers(wrongAnswers);
+            card.setAnswers(newWrongAnswers);
 
             storageManager.updateFlashcard(setId, card);
             Log.d(TAG, "Cập nhật flashcard: " + card.getId());

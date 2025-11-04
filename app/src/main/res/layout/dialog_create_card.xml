@@ -48,7 +48,7 @@
                 android:id="@+id/btn_translate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dịch"
+                android:text="Dịch nhanh"
                 android:layout_marginStart="8dp"
                 android:backgroundTint="#1976D2"
                 android:textColor="@android:color/white"/>

@@ -1,5 +1,6 @@
 package com.example.flashcard.ui.SetActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +19,7 @@ import com.example.flashcard.models.Flashcard;
 import com.example.flashcard.models.FlashcardSet;
 import com.example.flashcard.storage.StorageManager;
 import com.example.flashcard.ui.BaseActivity;
+import com.example.flashcard.ui.StudyActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -82,8 +84,16 @@ public class SetActivity extends BaseActivity implements FlashcardAdapter.OnFlas
         );
 
         // Xu li che do learn o day
-        btnLearn.setOnClickListener(v -> Toast.makeText(this, "Vào học", Toast.LENGTH_SHORT).show());
-
+        btnLearn.setOnClickListener(v -> {
+            // Khởi động StudyActivity và gửi ID của Set hiện tại
+            if (currentSet != null) { // Thêm kiểm tra null cho chắc
+                Intent intent = new Intent(SetActivity.this, StudyActivity.class);
+                intent.putExtra("SET_ID_TO_STUDY", currentSet.getId()); // Gửi ID qua Intent
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Không thể mở chế độ học!", Toast.LENGTH_SHORT).show();
+            }
+        });
         // xu li che do quiz ơ day
         btnQuiz.setOnClickListener(v -> Toast.makeText(this, "Vào quiz", Toast.LENGTH_SHORT).show());
     }
