@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -5,16 +6,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/headerTitle"
+    <!-- HEADER BAR -->
+    <LinearLayout
+        android:id="@+id/headerBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:background="@color/blue_primary" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/blue_primary"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
+        <!-- Nút back (tùy chọn, có thể GONE) -->
+        <ImageButton
+            android:id="@+id/btnHeaderBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/white"
+            android:visibility="gone" />
+
+        <!-- Tiêu đề giữa -->
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Khe phải để custom action -->
+        <FrameLayout
+            android:id="@+id/headerRightContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- NỘI DUNG -->
     <FrameLayout
         android:id="@+id/contentFrame"
         android:layout_width="match_parent"
@@ -22,6 +53,7 @@
         android:layout_weight="1"
         android:background="@color/white" />
 
+    <!-- BOTTOM BAR -->
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"

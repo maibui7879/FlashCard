@@ -1,99 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <RelativeLayout
+        android:id="@+id/rvlToolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/tvSetName"
-            android:text="Tên bộ thẻ"
-            android:textStyle="bold"
-            android:textSize="18sp"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_arrow_back"
+            android:layout_alignParentStart="true"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/tvProgress"
-            android:text="1/10"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/tvQuestion"
-            android:text="Câu hỏi"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!-- Option Buttons -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOption1"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:backgroundTint="@color/btn_neutral_tint"
-            android:textColor="@android:color/black"/>
+            android:layout_centerVertical="true"
+            android:textSize="16sp"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/black"
+            android:text="Quizz: Ngữ pháp TOEIC"
+            android:layout_toEndOf="@+id/btnBack"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOption2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:backgroundTint="@color/btn_neutral_tint"
-            android:textColor="@android:color/black"/>
+    </RelativeLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOption3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:backgroundTint="@color/btn_neutral_tint"
-            android:textColor="@android:color/black"/>
+    <TextView
+        android:id="@+id/tvTitleName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tên bộ thẻ"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvlToolbar" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOption4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:backgroundTint="@color/btn_neutral_tint"
-            android:textColor="@android:color/black"/>
+    <TextView
+        android:id="@+id/tvSetName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/tvTitleName"
+        app:layout_constraintTop_toTopOf="@+id/tvTitleName" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOption5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:backgroundTint="@color/btn_neutral_tint"
-            android:textColor="@android:color/black"/>
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Số thứ tự câu"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/tvTitleName"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleName"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOption6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:backgroundTint="@color/btn_neutral_tint"
-            android:textColor="@android:color/black"/>
+    <TextView
+        android:id="@+id/tvProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="1/10"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCount"
+        app:layout_constraintStart_toEndOf="@+id/tvCount"
+        app:layout_constraintTop_toTopOf="@+id/tvCount" />
 
-        <!-- Next Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNext"
-            android:text="Câu tiếp theo"
-            android:enabled="false"
-            android:layout_marginTop="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:backgroundTint="@color/btn_primary_tint"
-            android:textColor="@android:color/white" />
+    <TextView
+        android:id="@+id/tvTitleQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Câu hỏi"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvProgress" />
 
-    </LinearLayout>
-</ScrollView>
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+       android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTitleQuestion"
+        app:layout_constraintStart_toEndOf="@+id/tvTitleQuestion"
+        app:layout_constraintTop_toTopOf="@id/tvTitleQuestion" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:enabled="false"
+        android:text="Câu tiếp theo"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bg_button_gradient"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnOption1"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/bg_rounded_choice"
+        android:text="Đáp án 1"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvQuestion" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnOption2"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_rounded_choice"
+        android:text="Đáp án 2"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnOption1" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnOption3"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_rounded_choice"
+        android:text="Đáp án 3"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toTopOf="@id/btnNext"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnOption1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnOption4"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_rounded_choice"
+        android:text="Đáp án 4"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/btnOption3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnOption3"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,16 +58,21 @@ public class QuizActivity extends BaseActivity {
         renderQuestion();
     }
 
+    @Override
+    protected boolean showHeader() {
+        return false;
+    }
+
     private void bindViews() {
+        ImageView tvBack = findViewById(R.id.btnBack);
+        tvBack.setOnClickListener(view -> onBackPressed());
         tvSetName  = findViewById(R.id.tvSetName);
         tvProgress = findViewById(R.id.tvProgress);
         tvQuestion = findViewById(R.id.tvQuestion);
         optionButtons[0] = findViewById(R.id.btnOption1);
         optionButtons[1] = findViewById(R.id.btnOption2);
         optionButtons[2] = findViewById(R.id.btnOption3);
-        optionButtons[3] = findViewById(R.id.btnOption4);
-        optionButtons[4] = findViewById(R.id.btnOption5);
-        optionButtons[5] = findViewById(R.id.btnOption6);
+        optionButtons[3] = findViewById(R.id.btnOption4);;
         btnNext = findViewById(R.id.btnNext);
 
         tvSetName.setText(setName);
@@ -83,7 +89,6 @@ public class QuizActivity extends BaseActivity {
         enableOptions(true);
         btnNext.setEnabled(false);
 
-        for (Button b : optionButtons) if (b != null) b.setBackgroundColor(0xFFFFFFFF);
 
         Flashcard card = questions.get(qIndex);
         tvQuestion.setText(card.getName());

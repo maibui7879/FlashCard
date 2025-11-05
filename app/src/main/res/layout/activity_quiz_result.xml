@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:padding="24dp"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -31,21 +32,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnRetry"
         android:text="Làm lại"
         android:layout_marginTop="24dp"
+        android:background="@drawable/bg_button_gradient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:backgroundTint="@color/btn_primary_tint"
         android:textColor="@android:color/white"/>
 
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnBack"
         android:text="Về trước"
         android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:backgroundTint="@color/btn_neutral_tint"
+        android:background="@drawable/bg_border_16dp_d6e4ff"
         android:textColor="@android:color/black"/>
 </LinearLayout>
