@@ -25,7 +25,6 @@ public class MainActivity extends BaseActivity implements MainSetAdapter.OnItemC
     private RecyclerView rvLearnSets;
     private RecyclerView rvQuizSets;
 
-    // TextView để hiện thông báo khi không có thẻ
     private TextView tvEmptyState;
 
     private List<FlashcardSet> allSets;
